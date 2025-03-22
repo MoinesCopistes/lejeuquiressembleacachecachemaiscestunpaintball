@@ -58,14 +58,14 @@ int main(int argc, char **argv) {
     // trucs
 
     if (IsKeyDown(KEY_W)) {
-      p_player_prey_move(players[playerID], &cursor);
+      p_player_move((Player *) players[playerID], &cursor);
     }
     // p_player_prey_move(players[1],&cursor,time);
 
     for (int i = 0; i < 4; i++) {
       if (players[i] != NULL) {
-        DrawCircle((int)players[i]->hitbox.pos.x, (int)players[i]->hitbox.pos.y,
-                   players[i]->hitbox.radius, DARKBLUE);
+        DrawCircle((int)players[i]->p.hitbox.pos.x, (int)players[i]->p.hitbox.pos.y,
+                   players[i]->p.hitbox.radius, DARKBLUE);
       }
     }
 

@@ -15,12 +15,4 @@
 
 extern PlayerPrey *players[4];
 
-typedef struct {
-  float x, y;
-} Player;
-
-typedef struct {
-  Player* players;
-} World;
-
 extern float dt;

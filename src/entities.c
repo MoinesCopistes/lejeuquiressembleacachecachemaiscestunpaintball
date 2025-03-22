@@ -35,8 +35,8 @@ Paint_ball* p_paint_ball_create(Position *start, Position *cursor, unsigned int 
 
     float normal = p_fast_inverse_sqrt((cursor->x - start->x) * (cursor->x - start->x) + (cursor->y - start->y) * (cursor->y - start->y));
 
-    ball->speed_x = speed_pain_ball * speed_coeff * normal * (cursor->x - start->x);
-    ball->speed_y = speed_pain_ball * speed_coeff * normal * (cursor->y - start->y);
+    ball->speed_x = SPEED_PAINT_BALL * speed_coeff * normal * (cursor->x - start->x);
+    ball->speed_y = SPEED_PAINT_BALL * speed_coeff * normal * (cursor->y - start->y);
 
     return ball;
 }

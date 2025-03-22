@@ -83,7 +83,7 @@ void p_handle_event(Event *event, int clientID) {
 
   if (event->type == EVENT_PLAYER_MOVE) {
     EventPlayerMove* epm = (EventPlayerMove*) event;
-    players[epm->e.playerID]->hitbox.pos.x = epm->x;
-    players[epm->e.playerID]->hitbox.pos.y = epm->y;
+    players[epm->e.playerID]->p.hitbox.pos.x = epm->x;
+    players[epm->e.playerID]->p.hitbox.pos.y = epm->y;
   }
 }
