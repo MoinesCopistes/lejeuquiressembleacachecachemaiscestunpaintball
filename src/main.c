@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include "geo.h"
 int main(void)
 {
     // Initialization
