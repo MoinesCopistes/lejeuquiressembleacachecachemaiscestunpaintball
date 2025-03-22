@@ -27,10 +27,10 @@ typedef struct {
 
 
 typedef struct {
-    Tile* tiles;
-} Map;
+    Image sprite;
+
+} Tile;
 
 typedef struct {
-    Image sprite;
-    
-} Tile;
+    Tile* tiles;
+} Map;
