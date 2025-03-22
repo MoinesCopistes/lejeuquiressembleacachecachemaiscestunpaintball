@@ -12,8 +12,12 @@ extern int playersNumber;
 extern int playerID;
 
 enum EventType {
+  // asks for an id and also tells other clients a new one is here
   EVENT_HELLO = 0,
+  // message from server to client to give it an ID
   EVENT_ASSIGN_ID,
+
+  // message for player movement
   EVENT_PLAYER_MOVE
 };
 
