@@ -2,14 +2,11 @@
 #define ENTITIES_H
 
 #define OBJECT_LIMIT 256
-#define ENTITY_NUMBER 1 //TODO : à update à chaque fois qu'une nouvelle entité est codée
+#define SPEED_PAINT_BALL 1500.0
 
 #include "geo.h"
-#include "defines.h"
-#include <stdlib.h>
-#include <stdio.h>
 
-typedef enum {ENTITY_PAINT_BALL} EntityType;
+typedef enum {ENTITY_PAINT_BALL, ENTITY_NUMBER} EntityType;
 
 typedef struct Entity Entity;
 struct Entity
@@ -27,7 +24,6 @@ extern void (*EntityFreeFunctions[ENTITY_NUMBER])(Entity *entity);
 
 //Different entities
 
-float speed_pain_ball; //on stocke la vitesse de base d'une paint ball globalement
 typedef struct Paint_ball Paint_ball;
 struct Paint_ball
 {
@@ -61,3 +57,4 @@ int p_entity_tab_add(Entity* entity);
 void p_entity_tab_dead_free(); //Pour free les éléments label en dead. ON FREE -> ON MET NULL 
 
 #endif
+

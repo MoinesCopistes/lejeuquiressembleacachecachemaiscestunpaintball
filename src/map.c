@@ -2,6 +2,7 @@
 #include "utils.c"
 #include "defines.h"
 
+
 /**
  * @param path the path to the png file
  * @param x the position in the tileset of the texture in x

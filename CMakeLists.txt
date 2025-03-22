@@ -3,7 +3,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(paintball)
 
-
 # Add raylib
 option(BUILD_EXAMPLES "Build examples" OFF)
 add_subdirectory(vendor/raylib)

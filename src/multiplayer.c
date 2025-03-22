@@ -17,7 +17,7 @@ This will set all mandatory fields on the event.
 Event *new_event(unsigned long size, enum EventType type) {
   Event *e = malloc(size);
   e->magic = 69;
-  e->playerID = playerID;
+  e->playerID = world.playerID;
   e->type = type;
   e->memberCount = 1;
   e->dont_free = 0;
@@ -37,14 +37,14 @@ void init_multiplayer() {
     Event *hello = new_event(sizeof(Event), EVENT_HELLO);
     broadcast_event(hello, -1);
     log_info("Waiting for the server to get a playerID");
-    while (!playerID) {
+    while (!world.playerID) {
     }
-    playersNumber = playerID + 1;
+    world.playersNumber = world.playerID + 1;
   }
 
-  for (int i = 0; i <= playerID; i++) {
+  for (int i = 0; i <= world.playerID; i++) {
     Circle c = {{200 + 100 * i, 200}, 30};
-    players[i] = p_player_prey_create(i, 400, &c);
+    world.players[i] = (Player*) p_player_prey_create(i, 300, &c);
   }
 }
 
@@ -63,27 +63,28 @@ void p_handle_event(Event *event, int clientID) {
     log_info("New player detected. Giving a new playerID");
     EventAssignId *eai =
         (EventAssignId *)new_event(sizeof(EventAssignId), EVENT_ASSIGN_ID);
-    eai->id = playersNumber;
+    eai->id = world.playersNumber;
     send_event((Event *)eai, clientID);
   }
 
   if (event->type == EVENT_HELLO) {
-    int newClientId = playersNumber;
+    int newClientId = world.playersNumber;
     printf("Adding the %d player\n", newClientId);
-    playersNumber++;
+    world.playersNumber++;
     Circle c = {{200 + 100 * newClientId, 200}, 30};
-    players[newClientId] = p_player_prey_create(newClientId, 400, &c);
+    world.players[newClientId] = (Player*)p_player_prey_create(newClientId, 300, &c);
   }
 
   if (event->type == EVENT_ASSIGN_ID) {
     EventAssignId *eai = (EventAssignId *)event;
-    playerID = eai->id;
-    log_info("Got the id %d ", playerID);
+    world.playerID = eai->id;
+    log_info("Got the id %d ", world.playerID);
   }
 
   if (event->type == EVENT_PLAYER_MOVE) {
     EventPlayerMove* epm = (EventPlayerMove*) event;
-    players[epm->e.playerID]->hitbox.pos.x = epm->x;
-    players[epm->e.playerID]->hitbox.pos.y = epm->y;
+    world.players[epm->e.playerID]->hitbox.pos.x = epm->x;
+    world.players[epm->e.playerID]->hitbox.pos.y = epm->y;
   }
 }
+

@@ -1,7 +1,7 @@
 #pragma once
 #include "player.h"
 #include "raylib.h"
-#include "log.h"
+#include "entities.h"
 
 #define player_radius 10
 #define player_color RED
@@ -22,15 +22,6 @@
 #define SCOPE(...)          for(int MACROVAR(_i_) = 0; !MACROVAR(_i_); ++MACROVAR(_i_), __VA_ARGS__)
 
 
-extern PlayerPrey *players[4];
-
-typedef struct {
-    float x, y;
-} Player;
-
-typedef struct {
-    Player* players;
-} World;
 
 
 typedef struct {
@@ -54,5 +45,21 @@ typedef struct {
     int cols;
 } Map;
 
-extern float dt;
+enum game_states {
+  IN_MENU,
+  IN_SETTINGS,
+  IN_GAME,
+};
 
+extern const int screenWidth;
+extern const int screenHeight;
+extern enum game_states game_state;
+
+extern float dt;
+typedef struct {
+  Player* players[4];
+  Entity* entities[512];
+  int playerID;
+  int playersNumber;
+} World;
+extern World world;

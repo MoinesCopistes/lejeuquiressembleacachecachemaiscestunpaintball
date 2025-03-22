@@ -45,6 +45,13 @@ int p_circle_is_in_rect(Circle *circle, Rect *rect)
     return (Dx * Dx) + (Dy * Dy) <= circle->radius * circle->radius;
 }
 
+Position p_cast_vector_to_position(Vector2 vec)
+{
+    Position pos;
+    pos.x = (float)vec.x;
+    pos.y = (float)vec.y;
+    return pos;
+}
 
 float p_fast_inverse_sqrt(float number)
 {
