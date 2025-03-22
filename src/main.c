@@ -97,6 +97,7 @@ int main(int argc, char **argv) {
   CloseWindow(); // Close window and OpenGL context
   p_player_prey_free(players[0]);
   p_player_prey_free(players[1]);
+  free(menu_buttons);
   //--------------------------------------------------------------------------------------
 
   return 0;
