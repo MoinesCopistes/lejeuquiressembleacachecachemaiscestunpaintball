@@ -1,22 +1,25 @@
 #include <raylib.h>
 #include "world.h"
 #include "geo.h"
-#include "map.c"
+#include "map.h"
 
 int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenWidth = screen_x;
+    const int screenHeight = screen_y;
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
-    Tile tile = {p_load_image("2D Pixel Dungeon Asset Pack v2.0/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Tileset.png", 16, 16), (Position) {200.0, 200.0}};
-    Map map = {&tile, 1};
     // Main game loop
+
+
+
+    Map* map = p_load_map("map.txt");
+    Texture2D text = p_assemble_atlas(map);
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         // Update
@@ -27,10 +30,10 @@ int main(void)
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
-            ClearBackground(BLACK);
-            p_draw_map(map);
+            ClearBackground(RAYWHITE);
             //DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
-            
+            DrawTexture(text, 0, 0, WHITE);
+
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
