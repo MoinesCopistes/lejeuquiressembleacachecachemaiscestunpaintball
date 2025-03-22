@@ -29,8 +29,8 @@ int main(void)
     c2.pos.x = 500;
     c2.pos.y = 200;
 
-    players[0] = p_player_prey_create(0, 200, &c1);
-    players[1] = p_player_prey_create(0, 200, &c2);
+    players[0] = p_player_prey_create(0, 400, &c1);
+    players[1] = p_player_prey_create(0, 400, &c2);
 
     // -------------------------------------------------------------------------------------
 
@@ -59,6 +59,9 @@ int main(void)
     
             if(IsKeyDown(KEY_W))
                 p_player_prey_move(players[0],&cursor);
+            else
+                players[0]->accel_coeff = 0.2;
+            
             //p_player_prey_move(players[1],&cursor,dt);
 
             //DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
