@@ -44,26 +44,22 @@ int main(void) {
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
-    switch (game_state) {
-    case IN_MENU:
-
-      break;
-    case IN_SETTINGS:
-
-      break;
-    case IN_GAME:
-
-      break;
-    }
 
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
 
-    p_draw_button(&test_button);
+    switch (game_state) {
+    case IN_MENU:
 
-    DrawText("Congrats! You created your first window!", 190, 200, 20,
-             LIGHTGRAY);
+      p_draw_button(&test_button);
+      break;
+    case IN_SETTINGS:
+
+      break;
+    case IN_GAME:
+      break;
+    }
 
     EndDrawing();
     //----------------------------------------------------------------------------------
