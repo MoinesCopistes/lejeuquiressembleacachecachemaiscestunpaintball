@@ -10,6 +10,7 @@
  * @return the image pointer loaded in RAM
 */
 Image _init_tile(const char* path, int x, int y, int deg) {
+    log_debug("init_tile called");
     Image image = LoadImage(path);
     if (image.data == NULL) {
         log_error("Failed to load image: %s", path);
@@ -62,6 +63,7 @@ Image* _get_image(char input, TileSet* tileset){
         }
     }
 }
+
 Tile** _get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col], TileSet** tileset){
     Tile** tiles = (Tile**) malloc(sizeof(Tile*) * n_row);
     if (tiles == NULL){log_error("Couldn't malloc Tile** in map.c");}
