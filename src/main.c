@@ -1,6 +1,7 @@
 #include "defines.h"
 #include "menu.h"
 #include <raylib.h>
+#include <stdio.h>
 
 enum game_states {
   IN_MENU,
@@ -35,11 +36,10 @@ int main(void) {
 
     switch (game_state) {
     case IN_MENU:
-      Button *button_ptr = menu_buttons;
       for (int i = 0; i < NUMBER_OF_MENU_BUTTONS; i++) {
+        Button *button_ptr = &menu_buttons[i];
         p_menu_check_inputs(mousePoint, button_ptr);
         p_draw_button(button_ptr, WHITE, RED);
-        button_ptr += sizeof(Button *);
       }
       break;
     case IN_SETTINGS:

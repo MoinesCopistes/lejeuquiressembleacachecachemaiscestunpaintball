@@ -1,7 +1,7 @@
 #pragma once
 #include <raylib.h>
 
-#define NUMBER_OF_MENU_BUTTONS 1
+#define NUMBER_OF_MENU_BUTTONS 3
 
 typedef struct {
   Texture2D button_texture; // contains a big file with all the button's frames

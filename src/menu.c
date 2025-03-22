@@ -31,10 +31,49 @@ Button *p_init_buttons() {
       0,
       4,
       "Start",
-      p_play_sound_void_arg,
+      NULL,
   };
 
   buttons[0] = start_button;
+
+  // Define button bounds on screen
+  Rectangle settings_button_bounds = {
+      screenWidth / 2.0f - button_background_source_rectangle.width / 2.0f,
+      screenHeight / 2.0f - button_background_frame_height / 2.0f +
+          button_background_frame_height * 1.7f,
+      (float)button_background_texture.width, button_background_frame_height};
+
+  Button settings_button = {
+      button_background_texture,
+      button_background_source_rectangle,
+      settings_button_bounds,
+      button_background_frame_height,
+      0,
+      4,
+      "Settings",
+      NULL,
+  };
+  buttons[1] = settings_button;
+
+  // Define button bounds on screen
+  Rectangle IP_button_bounds = {
+      screenWidth / 2.0f - button_background_source_rectangle.width / 2.0f,
+      screenHeight / 2.0f - button_background_frame_height / 2.0f +
+          button_background_frame_height * 3.4f,
+      (float)button_background_texture.width, button_background_frame_height};
+
+  Button IP_button = {
+      button_background_texture,
+      button_background_source_rectangle,
+      IP_button_bounds,
+      button_background_frame_height,
+      0,
+      4,
+      "Look for IP",
+      NULL,
+  };
+  buttons[2] = IP_button;
+  return buttons;
 }
 
 void p_draw_button(Button *button, Color tint, Color text_color) {
@@ -95,9 +134,7 @@ void p_menu_check_inputs(Vector2 mouse_pos, Button *button) {
     button->current_frame = 0;
 
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-    Sound fxButton = LoadSound("resources/record_out.wav"); // Load button sound
-    button->p_button_function((void *)&fxButton);
-    UnloadSound(fxButton); // Unload sound
+    // button->p_button_function((void *)&fxButton);
   }
 }
 
