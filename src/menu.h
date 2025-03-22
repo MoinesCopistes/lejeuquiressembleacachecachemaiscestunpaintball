@@ -7,7 +7,7 @@ typedef struct {
   Rectangle button_bounds;    // rect physical button
   float frame_height;         // the height of one button frame
   int current_frame;          // the current frame to display
-  void *(*p_button_function)(void *arg1, void *arg2);
+  void *(*p_button_function)(void *arg_struct);
 } Button;
 
 void p_draw_button(Button *button); // draws a button
