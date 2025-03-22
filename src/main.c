@@ -26,7 +26,7 @@ int main(void)
             ClearBackground(RAYWHITE);
 
             DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
-            p_draw_player(10.0,10.0);
+            
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
