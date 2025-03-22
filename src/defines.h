@@ -2,7 +2,9 @@
 #include "raylib.h"
 
 #define player_radius 10
-#define player_color DARKGRAY
+#define player_color RED
+#define wall_size 20
+#define wall_color DARKGRAY
 
 
 
