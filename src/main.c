@@ -1,6 +1,8 @@
 #include <raylib.h>
 #include "world.h"
 #include "geo.h"
+#include "map.c"
+
 int main(void)
 {
     // Initialization
@@ -12,7 +14,8 @@ int main(void)
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
-
+    Tile tile = {p_load_image("2D Pixel Dungeon Asset Pack v2.0/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Tileset.png", 16, 16), (Position) {200.0, 200.0}};
+    Map map = {&tile, 1};
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
@@ -25,8 +28,8 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
             ClearBackground(BLACK);
-
-            DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+            p_draw_map(map);
+            //DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
             
         EndDrawing();
         //----------------------------------------------------------------------------------

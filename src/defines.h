@@ -1,10 +1,13 @@
 #pragma once
 #include "raylib.h"
+#include "geo.h"
 
 #define player_radius 10
 #define player_color RED
 #define wall_size 20
 #define wall_color DARKGRAY
+#define tile_size 16
+#define tile_scale 5.0
 
 
 
@@ -25,11 +28,12 @@ typedef struct {
     Player* players;
 } World;
 
-
 typedef struct {
     Texture2D sprite;
+    Position pos;
 } Tile;
 
 typedef struct {
     Tile* tiles;
+    int n_tiles;
 } Map;
