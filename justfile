@@ -1,5 +1,5 @@
 run:
-    make -C build
+    make -C build -j16
     ./build/paintball
 
 setup:
