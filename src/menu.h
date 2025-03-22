@@ -14,13 +14,11 @@ typedef struct {
                         // in the intended center of the button with the right
                         // font size)
   char *button_string;  // the string that will be showed by the button
-  void *(*p_button_function)(
-      void *arg_struct); // function that is called by the button
+  void (*p_button_function)(); // function that is called by the button
 } Button;
 
 void p_draw_button(Button *button, Color tint,
                    Color text_color); // draws a button
 void p_menu_check_inputs(Vector2 mouse_position,
                          Button *button); // check inputs for menu
-void *p_play_sound_void_arg(void *sound); // play sound whit void casts
 Button *p_init_buttons();                 // init all menu buttons

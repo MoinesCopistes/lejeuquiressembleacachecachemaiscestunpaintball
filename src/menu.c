@@ -105,7 +105,7 @@ void p_draw_button(Button *button, Color tint, Color text_color) {
     // printf("available wi %i\n", available_width);
 
     if (available_width < available_height) {
-      font_size = available_width * 1.6;
+      font_size = available_width;
     } else {
       font_size = available_height;
     }
@@ -134,8 +134,6 @@ void p_menu_check_inputs(Vector2 mouse_pos, Button *button) {
     button->current_frame = 0;
 
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-    // button->p_button_function((void *)&fxButton);
+    button->p_button_function();
   }
 }
-
-void *p_play_sound_void_arg(void *sound) { PlaySound(*(Sound *)sound); }
