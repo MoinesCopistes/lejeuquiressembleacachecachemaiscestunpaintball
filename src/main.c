@@ -18,7 +18,7 @@ int main(void) {
   InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
   Texture2D test_button_texture =
-      LoadTexture("resources/NIQUE_TOIIIIIII.png"); // Load button texture
+      LoadTexture("resources/Start_button.png"); // Load button texture
 
   // Define frame rectangle for drawing
   float test_frame_height = (float)test_button_texture.height / 2;
@@ -36,6 +36,8 @@ int main(void) {
                         test_btn_bounds,
                         test_frame_height,
                         0,
+                        1,
+                        NULL,
                         NULL};
 
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
@@ -52,7 +54,7 @@ int main(void) {
     switch (game_state) {
     case IN_MENU:
 
-      p_draw_button(&test_button);
+      p_draw_button(&test_button, WHITE, LIGHTGRAY);
       break;
     case IN_SETTINGS:
 
