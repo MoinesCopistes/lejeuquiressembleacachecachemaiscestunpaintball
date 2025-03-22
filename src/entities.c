@@ -1,5 +1,13 @@
 #include "entities.h"
 
+Entity* p_entity_create(EntityType type, unsigned long size)
+{
+    Entity *e = (Entity *) malloc(size);
+    e->type = type;
+    e->alive = 1;
+    return e;
+}
+
 void (*EntityUpdateFunctions[ENTITY_NUMBER])(Entity *entity) = {
     p_paint_ball_update
 };
@@ -12,9 +20,7 @@ void (*EntityFreeFunctions[ENTITY_NUMBER])(Entity *entity) = {
 
 Paint_ball* p_paint_ball_create(Position *start, Position *cursor, unsigned int iD, unsigned int player_id, float speed_coeff, float radius, float splash_radius, float max_dis_squared)
 {
-    Paint_ball *ball = (Paint_ball *) malloc(sizeof(Paint_ball));
-
-    ball->type = ENTITY_PAINT_BALL;
+    Paint_ball *ball = (Paint_ball *) p_entity_create(ENTITY_PAINT_BALL,sizeof(Paint_ball));
 
     ball->iD = iD;
     ball->player_id = player_id;
@@ -49,7 +55,7 @@ void p_paint_ball_update(Entity *entity)
     ball->hitbox.pos.x += dx;
     ball->hitbox.pos.y += dy;
     ball->dis_squared += (dx * dx) + (dy * dy);    
-    ball->alive = ball->dis_squared < ball->max_dis_squared;
+    ball->e.alive = ball->dis_squared < ball->max_dis_squared;
 }
 
 //Entity tab

@@ -20,6 +20,8 @@ struct Entity
     //---    
 };
 
+Entity* p_entity_create(EntityType type, unsigned long size);
+
 extern void (*EntityUpdateFunctions[ENTITY_NUMBER])(Entity *entity);
 extern void (*EntityFreeFunctions[ENTITY_NUMBER])(Entity *entity);
 
@@ -30,8 +32,7 @@ typedef struct Paint_ball Paint_ball;
 struct Paint_ball
 {
     //--- Universel
-    EntityType type;
-    int alive;
+    Entity e;
     //---    
     float speed_x, speed_y; //on stocke dans la struct les vitesses horizontales et verticales (moins de calculs)
     Circle hitbox;
@@ -41,6 +42,7 @@ struct Paint_ball
     unsigned int player_id;
     unsigned int iD;
 };
+
 
 Paint_ball* p_paint_ball_create(Position *start, Position *cursor, unsigned int iD, unsigned int player_id, float speed_coeff, float radius, float splash_radius, float max_dis_squared);
 void p_paint_ball_free(Entity *entity); //au cas où il y a des pointeurs dedans plus tard
