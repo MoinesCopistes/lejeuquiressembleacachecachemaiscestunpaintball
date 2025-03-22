@@ -27,8 +27,7 @@ typedef struct {
 
 
 typedef struct {
-    Image sprite;
-
+    Texture2D sprite;
 } Tile;
 
 typedef struct {
