@@ -18,6 +18,7 @@ float dt;
 
 int main(int argc, char **argv) {
 
+  SetTraceLogLevel(LOG_NONE);
   if (argc == 1) {
     printf("Starting a server...\n");
     p_start_server();
