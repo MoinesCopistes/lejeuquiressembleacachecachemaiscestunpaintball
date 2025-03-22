@@ -18,9 +18,19 @@
 
 
 typedef struct {
-  float x, y;
+    float x, y;
 } Player;
 
 typedef struct {
-  Player* players;
+    Player* players;
 } World;
+
+
+typedef struct {
+    Tile* tiles;
+} Map;
+
+typedef struct {
+    Image sprite;
+    
+} Tile;
