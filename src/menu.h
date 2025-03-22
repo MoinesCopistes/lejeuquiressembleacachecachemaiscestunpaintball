@@ -6,7 +6,8 @@ typedef struct {
   Rectangle source_rectangle; // rect viewport on the texture
   Rectangle button_bounds;    // rect physical button
   float frame_height;         // the height of one button frame
-  int current_frame;          // the current frame to display
+  int current_frame;    // the current frame to display (0 : normal, 1 : mouse
+                        // over, 2 : mouse click)
   int border_thickness; // the thickness of the border of the texture (to draw
                         // in the intended center of the button with the right
                         // font size)
@@ -17,3 +18,7 @@ typedef struct {
 
 void p_draw_button(Button *button, Color tint,
                    Color text_color); // draws a button
+
+void p_menu_check_inputs(Vector2 mouse_position, Button *button);
+
+void *p_play_sound_void_arg(void *sound);
