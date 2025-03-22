@@ -44,6 +44,8 @@ void p_paint_ball_update(Paint_ball *ball, clock_t time); //renvoie si la balle 
 
 //Entity tab
 
+//TODO : Toutes les fonctions en dessous qui ont un switch ont besoin d'être modifiées à chaque fois qu'une nouvelle entité est codée
+
 extern Entity* EntityTab[OBJECT_LIMIT]; //UN ELEMENT VIDE DOIT ETRE ABSLUMENT NULL
 void p_entity_tab_init();
 void p_entity_tab_all_free(); //Pour free tout le tab. ON FREE -> ON MET NULL 
