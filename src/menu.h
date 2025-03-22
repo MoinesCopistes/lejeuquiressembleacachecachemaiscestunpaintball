@@ -1,6 +1,8 @@
 #pragma once
 #include <raylib.h>
 
+#define NUMBER_OF_MENU_BUTTONS 1
+
 typedef struct {
   Texture2D button_texture; // contains a big file with all the button's frames
   Rectangle source_rectangle; // rect viewport on the texture
@@ -18,7 +20,7 @@ typedef struct {
 
 void p_draw_button(Button *button, Color tint,
                    Color text_color); // draws a button
-
-void p_menu_check_inputs(Vector2 mouse_position, Button *button);
-
-void *p_play_sound_void_arg(void *sound);
+void p_menu_check_inputs(Vector2 mouse_position,
+                         Button *button); // check inputs for menu
+void *p_play_sound_void_arg(void *sound); // play sound whit void casts
+Button *p_init_buttons();                 // init all menu buttons

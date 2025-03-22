@@ -1,8 +1,41 @@
+#include "defines.h"
 #include "menu.h"
 #include <raylib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+Button *p_init_buttons() {
+  Button *buttons = malloc(sizeof(Button) * NUMBER_OF_MENU_BUTTONS);
+  Texture2D button_background_texture =
+      LoadTexture("resources/button_background.png"); // Load button texture
+
+  // Define frame rectangle for drawing
+  float button_background_frame_height =
+      (float)button_background_texture.height / 3;
+  Rectangle button_background_source_rectangle = {
+      0, 0, (float)button_background_texture.width,
+      button_background_frame_height};
+
+  // Define button bounds on screen
+  Rectangle start_button_bounds = {
+      screenWidth / 2.0f - button_background_source_rectangle.width / 2.0f,
+      screenHeight / 2.0f - button_background_frame_height / 2.0f,
+      (float)button_background_texture.width, button_background_frame_height};
+
+  Button start_button = {
+      button_background_texture,
+      button_background_source_rectangle,
+      start_button_bounds,
+      button_background_frame_height,
+      0,
+      4,
+      "Start",
+      p_play_sound_void_arg,
+  };
+
+  buttons[0] = start_button;
+}
 
 void p_draw_button(Button *button, Color tint, Color text_color) {
   float scale_factor =
@@ -35,7 +68,7 @@ void p_draw_button(Button *button, Color tint, Color text_color) {
     if (available_width < available_height) {
       font_size = available_width * 1.6;
     } else {
-      font_size = available_height * 1.6;
+      font_size = available_height;
     }
 
     int text_pos_x =
