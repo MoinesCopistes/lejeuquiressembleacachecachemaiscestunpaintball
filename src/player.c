@@ -12,6 +12,7 @@ Player* p_player_create(PlayerType type, unsigned int iD, float speed, Circle *h
     p->hitbox.radius = hitbox->radius;
     p->type = type;
     p->accel_coeff = 0.2;
+    return p;
 }
 
 void p_player_move(Player *player, Position *cursor) {

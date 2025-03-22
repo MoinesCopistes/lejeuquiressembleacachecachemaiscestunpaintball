@@ -22,7 +22,7 @@ const int screenWidth = screen_x;
 const int screenHeight = screen_y;
 enum game_states game_state = IN_MENU;
 
-PlayerPrey *players[4] = {NULL, NULL, NULL, NULL};
+Player *players[4] = {NULL, NULL, NULL, NULL};
 float dt;
 
 
@@ -76,7 +76,10 @@ int main(int argc, char **argv) {
       break;
     case IN_GAME:
       if (IsKeyDown(KEY_W)) {
-        p_player_move((Player*)players[world.playerID], &cursor_nul_de_tristan);
+        printf("cursor x : %f\n", cursor_nul_de_tristan.x);
+        printf("world.playerID : %d\n", world.playerID);
+        printf("hitbox : %f\n", ((Player*)players[world.playerID])->hitbox.pos.x);
+        p_player_move(players[world.playerID], &cursor_nul_de_tristan);
       }
       // trucs
 
@@ -84,8 +87,8 @@ int main(int argc, char **argv) {
 
       for (int i = 0; i < 4; i++) {
         if (players[i] != NULL) {
-          DrawCircle((int)players[i]->p.hitbox.pos.x,
-                     (int)players[i]->p.hitbox.pos.y, players[i]->p.hitbox.radius,
+          DrawCircle((int)players[i]->hitbox.pos.x,
+                     (int)players[i]->hitbox.pos.y, players[i]->hitbox.radius,
                      DARKBLUE);
         }
       }

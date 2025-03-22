@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(paintball)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -ggdb")
 
 # Add raylib
 option(BUILD_EXAMPLES "Build examples" OFF)

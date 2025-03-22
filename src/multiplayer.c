@@ -45,6 +45,7 @@ void init_multiplayer() {
   for (int i = 0; i <= world.playerID; i++) {
     Circle c = {{200 + 100 * i, 200}, 30};
     world.players[i] = (Player*) p_player_prey_create(i, 300, &c);
+    printf("world.players[%d] = %p\n", i, world.players[i]);
   }
 }
 
