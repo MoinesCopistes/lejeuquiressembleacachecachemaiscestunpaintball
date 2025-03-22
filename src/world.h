@@ -1,0 +1,1 @@
+bool p_draw_player(float x, float y);
