@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include "geo.h"
 #include "world.h"
 int main(void)
 {
