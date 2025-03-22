@@ -9,6 +9,8 @@ Event *new_event(unsigned long size, enum EventType type) {
   e->magic = 69;
   e->playerID = playerID;
   e->type = type;
+  e->memberCount = 1;
+  e->dont_free = 0;
   return e;
 }
 
@@ -30,7 +32,6 @@ void init_multiplayer() {
 }
 
 void p_handle_event(Event *event, int clientID) {
-  printf("Handling event type %d sent from client %d\n", event->type, clientID);
   if (event->type == EVENT_HELLO && isServer) {
     log_info("New player detected. Giving a new playerID");
     EventAssignId *eai =

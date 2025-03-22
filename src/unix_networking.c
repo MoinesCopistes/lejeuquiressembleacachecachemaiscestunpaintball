@@ -45,10 +45,13 @@ void send_event(Event *event, int client_id) {
 
 void broadcast_event(Event *event, int senderID) {
   if (isServer) {
+    event->memberCount = connectedClients;
+    if (senderID != -1) {
+      event->memberCount--;
+    }
     for (int i = 0; i < connectedClients; i++) {
       if (i == senderID)
         continue;
-      printf("Sending to %d\n", i);
       send_event(event, i);
     }
   } else {
@@ -70,10 +73,16 @@ void *handle_send(void *arg) {
   int client_socket = hsa->socket;
 
   isConnected = 1;
-  void *msg;
+  Event *msg;
   while (1) {
-    chan_recv(chan, &msg);
+    chan_recv(chan, (void*)&msg);
     send(client_socket, msg, 1023, 0);
+
+    msg->memberCount--;
+    if (msg->memberCount == 0 && !msg->dont_free) {
+      // message sent one so we can free the event
+      free(msg);
+    }
   }
 
   return NULL;
@@ -106,6 +115,7 @@ void *handle_recv(void *arg) {
       perror("Invalid event received. Ignoring it.");
       continue;
     } else {
+      e->dont_free = 1;
       p_handle_event(e, client_id);
       if (isServer) {
         broadcast_event(e, client_id);

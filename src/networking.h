@@ -21,6 +21,8 @@ typedef struct {
   int magic; // always 69
   enum EventType type;
   int playerID;
+  int memberCount;
+  bool dont_free;
 } Event;
 
 typedef struct {
