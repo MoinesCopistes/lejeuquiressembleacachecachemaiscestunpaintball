@@ -1,40 +1,53 @@
 #include <raylib.h>
-int main(void)
-{
-    // Initialization
-    //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
+enum game_states {
+  IN_MENU,
+  IN_SETTINGS,
+  IN_GAME,
+};
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
+int main(void) {
+  // Initialization
+  //--------------------------------------------------------------------------------------
+  const int screenWidth = 800;
+  const int screenHeight = 450;
+  enum game_states game_state = IN_MENU;
 
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
-    {
-        // Update
-        //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
-        //----------------------------------------------------------------------------------
+  InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
-        // Draw
-        //----------------------------------------------------------------------------------
-        BeginDrawing();
+  SetTargetFPS(60); // Set our game to run at 60 frames-per-second
+  //--------------------------------------------------------------------------------------
 
-            ClearBackground(RAYWHITE);
+  // Main game loop
+  while (!WindowShouldClose()) // Detect window close button or ESC key
+  {
+    switch (game_state) {
+    case IN_MENU:
 
-            DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+      break;
+    case IN_SETTINGS:
 
-        EndDrawing();
-        //----------------------------------------------------------------------------------
+      break;
+    case IN_GAME:
+
+      break;
     }
 
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
+    BeginDrawing();
 
-    return 0;
+    ClearBackground(RAYWHITE);
+
+    DrawText("Congrats! You created your first window!", 190, 200, 20,
+             LIGHTGRAY);
+
+    EndDrawing();
+    //----------------------------------------------------------------------------------
+  }
+
+  // De-Initialization
+  //--------------------------------------------------------------------------------------
+  CloseWindow(); // Close window and OpenGL context
+  //--------------------------------------------------------------------------------------
+
+  return 0;
 }
