@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include "geo.h"
+#include "world.h"
 int main(void)
 {
     // Initialization
@@ -23,11 +24,10 @@ int main(void)
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
-
             ClearBackground(RAYWHITE);
 
             DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
-
+            
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
