@@ -3,24 +3,6 @@
 #include "defines.h"
 
 
-Image ImageResizeNearestNeighbor(Image image, int newWidth, int newHeight) {
-    Image result = GenImageColor(newWidth, newHeight, BLANK);
-
-    float xRatio = (float)image.width / newWidth;
-    float yRatio = (float)image.height / newHeight;
-
-    for (int y = 0; y < newHeight; y++) {
-        for (int x = 0; x < newWidth; x++) {
-            int srcX = (int)(x * xRatio);
-            int srcY = (int)(y * yRatio);
-            Color pixel = GetImageColor(image, srcX, srcY);
-            ImageDrawPixel(&result, x, y, pixel);
-        }
-    }
-
-    return result;
-}
-
 /**
  * @param path the path to the png file
  * @param x the position in the tileset of the texture in x
@@ -35,11 +17,7 @@ Image _init_tile(const char* path, int x, int y, int deg) {
         return (Image){0};
     }
     ImageCrop(&image, (Rectangle){x, y, tile_size, tile_size});
-    int newWidth = image.width * texture_scale;
-    int newHeight = image.height * texture_scale;
-    Image resizedImage = ImageResizeNearestNeighbor(image, newWidth, newHeight);
-    UnloadImage(image);
-    image = resizedImage;
+    ImageResizeNN(&image, image.width * texture_scale, image.height * texture_scale);
     ImageRotate(&image, deg);
     return image;
 }
@@ -52,15 +30,11 @@ Texture2D p_assemble_atlas(Map* map) {
         log_error("Map is NULL in p_assemble_atlas");
         return (Texture2D){0};
     }
-
-    // Create a blank image for the atlas
     Image blank = GenImageColor(map->cols * tile_size, map->rows * tile_size, BLANK);
     if (blank.data == NULL) {
         log_error("Failed to create blank image");
         return (Texture2D){0};
     }
-
-    // Draw each tile onto the blank image
     for (int i = 0; i < map->rows; i++) {
         for (int j = 0; j < map->cols; j++) {
             Tile tile = map->tiles[i][j];
@@ -75,22 +49,15 @@ Texture2D p_assemble_atlas(Map* map) {
                       WHITE);
         }
     }
-
-    // Convert the image to a texture
     Texture2D texture = LoadTextureFromImage(blank);
     if (texture.id == 0) {
         log_error("Failed to load texture from image");
     }
-
-    // Free the blank image
-    UnloadImage(blank);
-
     return texture;
 }
 
 Image _get_image(char input){
     const char* path = "2D Pixel Dungeon Asset Pack v2.0/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Tileset.png";
-    log_debug("Calling get_image with %c", input);
     switch (input)
     {
     case ' ':
@@ -104,7 +71,7 @@ Image _get_image(char input){
     case '4':
         return _init_tile(path, 0, 16, 0);
     case '5':
-        return _init_tile(path, 6 *16, 8 * 16, 0);
+        return _init_tile(path, 8 *16, 7 * 16, 0);
     case '6':
         return _init_tile(path, 5 * 16, 16, 0);
     case '7':
@@ -113,13 +80,13 @@ Image _get_image(char input){
         return _init_tile(path, 16, 4 * 16, 0);
     case '9':
         return _init_tile(path, 5 *16, 4* 16, 0);
-    case '^':
+    case 'a':
         return _init_tile(path, 2 * 16, 0, 0);
-    case '$':
+    case 'z':
         return _init_tile(path, 2 * 16, 0, 0);
-    case 'ù':
+    case 'q':
         return _init_tile(path, 3 * 16, 5 * 16, 0);
-    case 'µ':
+    case 's':
         return _init_tile(path, 0, 5 * 16, 0);
     default:
         log_error("Char couldn't be parsed in map.c for %c",input);
@@ -131,14 +98,13 @@ Tile** _get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col]){
     Tile** tiles = (Tile**) malloc(sizeof(Tile*) * n_row);
     if (tiles == NULL){log_error("Couldn't malloc Tile** in map.c");}
     for (int i = 0 ; i < n_row ; i++){
-        tiles[i] = (Tile*) malloc(sizeof(Tile) * n_row);
+        tiles[i] = (Tile*) malloc(sizeof(Tile) * n_col);
         if (tiles[i] == NULL){log_error("Couldn't malloc Tile* in map.c");}
     }
     for (int i = 0 ; i < n_row ; i++){
         for (int j = 0 ; j < n_col ; j++){
             tiles[i][j].pos = (Coordinate){j, i};
             Image img = _get_image(grid[i][j]);
-            log_debug("New img received");
             tiles[i][j].sprite = img;
         }
     }
@@ -151,16 +117,17 @@ void _print_map(Map* map){
         }
     }
 }
-void _print_chars(int n_col, int n_row, const char chars[n_col][n_row]){
-    for (int i =0 ; i < n_row ; i++){
-        for (int j = 0 ; j < n_col ; j++){
-            log_debug("Char at %i, %i is coor : %c", j, i, chars[j][i]);
+void _print_chars(int n_col, int n_row, const char chars[n_row][n_col]) {
+    for (int i = 0; i < n_row; i++) {
+        for (int j = 0; j < n_col; j++) {
+            log_debug("Char at %i, %i is : %c", j, i, chars[i][j]);
         }
     }
 }
 
 
 Map* p_load_map(const char* path){
+    SetTraceLogLevel(LOG_NONE);
     FILE* file = fopen(path, "r");
     if (file == NULL) {log_error("File not found when trying to load the map");}
     int x = 0;
@@ -197,7 +164,7 @@ Map* p_load_map(const char* path){
         }
     }
     fclose(file);
-    _print_chars(n_col, n_row, chars);
+    //_print_chars(n_col, n_row, chars);
     Tile** tiles = _get_tile_grid(n_col, n_row, chars);
     
     Map* map = malloc(sizeof(Map));
@@ -206,7 +173,7 @@ Map* p_load_map(const char* path){
     map->cols = n_col;
     map->rows = n_row;
     log_debug("Map loaded: cols = %d, rows = %d", map->cols, map->rows);
-    _print_map(map);
+    //_print_map(map);
     return map;
 }
 
