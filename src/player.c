@@ -1,4 +1,3 @@
-#include "player.h"
 #include "defines.h"
 #include "networking.h"
 void p_paint_regen(PlayerHunter *hunter) {

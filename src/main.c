@@ -1,11 +1,8 @@
-#include "defines.h"
-#include "geo.h"
-#include "player.h"
-#include "world.h"
 #include <log.h>
 #include <networking.h>
 #include <raylib.h>
 #include <stdio.h>
+#include "map.h"
 
 PlayerPrey *players[4] = {NULL, NULL, NULL, NULL};
 float dt;
@@ -17,8 +14,6 @@ int playerID = 0;
 int playersNumber = 1;
 
 int main(int argc, char **argv) {
-  // Removing raylib log
-  SetTraceLogLevel(LOG_NONE);
 
   if (argc == 1) {
     printf("Starting a server...\n");
@@ -34,18 +29,20 @@ int main(int argc, char **argv) {
 
   // Initialization
   //--------------------------------------------------------------------------------------
-  const int screenWidth = 800;
-  const int screenHeight = 450;
+  const int screenWidth = screen_x;
+  const int screenHeight = screen_y;
 
   InitWindow(screenWidth, screenHeight, "paintball client");
 
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
-
+  Map* map = p_load_map("map.txt");
+  Texture2D text = p_assemble_atlas(map);
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
     ClearBackground(RAYWHITE);
+    DrawTexture(text, 0, 0, WHITE);
     dt = GetFrameTime();
     // Update
     //----------------------------------------------------------------------------------
@@ -67,6 +64,7 @@ int main(int argc, char **argv) {
         DrawCircle((int)players[i]->hitbox.pos.x, (int)players[i]->hitbox.pos.y,
                    players[i]->hitbox.radius, DARKBLUE);
       }
+
     }
 
     EndDrawing();

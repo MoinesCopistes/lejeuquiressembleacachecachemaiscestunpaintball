@@ -34,6 +34,4 @@ PlayerPrey* p_player_prey_create(unsigned int iD, float speed, Circle *hitbox);
 void p_player_prey_free(PlayerPrey *player);
 void p_player_prey_move(PlayerPrey *player, Position *cursor);
 
-
-
 #endif
