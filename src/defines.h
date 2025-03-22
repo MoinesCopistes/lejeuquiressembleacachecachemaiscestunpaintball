@@ -38,9 +38,15 @@ typedef struct {
 } Coordinate;
 
 typedef struct {
-    Image sprite;
+    Image* sprite;
     Coordinate pos;
 } Tile;
+
+typedef struct {
+    Image* images;
+    const char* ids;
+    int n_image;
+} TileSet;
 
 typedef struct {
     Tile** tiles;
