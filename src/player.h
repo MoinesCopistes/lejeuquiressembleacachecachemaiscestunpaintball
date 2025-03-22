@@ -2,10 +2,11 @@
 #define PLAYER_H
 
 #include "geo.h"
-#include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-typedef struct Player_hunter Player_hunter;
-struct Player_hunter
+typedef struct PlayerHunter PlayerHunter;
+struct PlayerHunter
 {
     float speed; //pas en global pour les futurs powerups
     unsigned int iD;
@@ -15,16 +16,19 @@ struct Player_hunter
     float paint_per_s; //regen rate
 };
 
-void p_paint_regen(Player_hunter *hunter, clock_t time);
+void p_paint_regen(PlayerHunter *hunter, float time);
 
-typedef struct Player_prey Player_prey;
-struct Player_prey
+typedef struct PlayerPrey PlayerPrey;
+struct PlayerPrey
 {
     float speed; //pas en global pour les futurs powerups
     unsigned int iD;
     Circle hitbox;
 };
 
+PlayerPrey* p_player_prey_create(unsigned int iD, float speed, Circle *hitbox);
+void p_player_prey_free(PlayerPrey *player);
+void p_player_prey_move(PlayerPrey *player, Position *cursor, float time);
 
 
 

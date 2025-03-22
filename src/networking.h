@@ -6,17 +6,30 @@ int p_start_client();
 extern int clients[MAX_CLIENT_NUMBER];
 extern int connectedClients;
 extern chan_t *clientsChan[MAX_CLIENT_NUMBER];
+extern int isConnected;
+extern int isServer;
+extern int playersNumber;
+extern int playerID;
 
-enum EventType { EVENT_HELLO = 0, EVENT_PLAYER_MOVE };
+enum EventType {
+  EVENT_HELLO = 0,
+  EVENT_ASSIGN_ID,
+  EVENT_PLAYER_MOVE
+};
 
 typedef struct {
   int magic; // always 69
   enum EventType type;
+  int playerID;
 } Event;
 
 typedef struct {
-  int magic; // always 69
-  enum EventType type;
+  Event e;
+  int id;
+} EventAssignId;
+
+typedef struct {
+  Event e;
   float x;
   float y;
 } EventPlayerMove;
@@ -38,3 +51,5 @@ void send_event(Event *event, int clientID);
       (unix_networking only)
 */
 void broadcast_event(Event *event, int senderID);
+void init_multiplayer();
+Event *new_event(unsigned long size, enum EventType type);

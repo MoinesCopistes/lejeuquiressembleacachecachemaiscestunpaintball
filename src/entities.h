@@ -4,7 +4,6 @@
 #define OBJECT_LIMIT 256
 
 #include "geo.h"
-#include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -40,7 +39,7 @@ struct Paint_ball
 
 Paint_ball* p_paint_ball_create(Position *start, Position *cursor, unsigned int iD, unsigned int player_id, float speed_coeff, float radius, float splash_radius, float max_dis_squared);
 void p_paint_ball_free(Paint_ball *ball); //au cas où il y a des pointeurs dedans plus tard
-void p_paint_ball_update(Paint_ball *ball, clock_t time); //renvoie si la balle est "vivante" ou pas"
+void p_paint_ball_update(Paint_ball *ball, float time); //renvoie si la balle est "vivante" ou pas"
 
 //Entity tab
 
@@ -49,7 +48,7 @@ void p_paint_ball_update(Paint_ball *ball, clock_t time); //renvoie si la balle 
 extern Entity* EntityTab[OBJECT_LIMIT]; //UN ELEMENT VIDE DOIT ETRE ABSLUMENT NULL
 void p_entity_tab_init();
 void p_entity_tab_all_free(); //Pour free tout le tab. ON FREE -> ON MET NULL 
-void p_entity_tab_update(clock_t time);
+void p_entity_tab_update(float time);
 int p_entity_tab_is_full();
 int p_entity_tab_add(Entity* entity);
 void p_entity_tab_dead_free(); //Pour free les éléments label en dead. ON FREE -> ON MET NULL 

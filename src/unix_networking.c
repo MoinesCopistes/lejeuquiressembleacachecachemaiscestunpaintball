@@ -21,6 +21,8 @@ chan_t *ss_chan;
 
 int isServer = 0;
 
+int isConnected = 0;
+
 /* EVENT HANDLING */
 
 Event *parse_event(void *data) {
@@ -46,6 +48,7 @@ void broadcast_event(Event *event, int senderID) {
     for (int i = 0; i < connectedClients; i++) {
       if (i == senderID)
         continue;
+      printf("Sending to %d\n", i);
       send_event(event, i);
     }
   } else {
@@ -66,10 +69,11 @@ void *handle_send(void *arg) {
   chan_t *chan = hsa->chan;
   int client_socket = hsa->socket;
 
+  isConnected = 1;
   void *msg;
   while (1) {
     chan_recv(chan, &msg);
-    send(client_socket, msg, 1024, 0);
+    send(client_socket, msg, 1023, 0);
   }
 
   return NULL;
@@ -150,6 +154,7 @@ void *server_main() {
 
   printf("Server is listening on port 8080...\n");
 
+  isConnected = 1;
   while (1) {
     int client_socket = accept(server_socket, NULL, NULL);
     if (client_socket < 0) {
