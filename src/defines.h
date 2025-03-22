@@ -13,6 +13,9 @@
 
 
 
+#define MAX_CLIENT_NUMBER 4
+
+
 #define MACROVAR(name)      CONCAT(name, __LINE__)
 #define SCOPE(...)          for(int MACROVAR(_i_) = 0; !MACROVAR(_i_); ++MACROVAR(_i_), __VA_ARGS__)
 

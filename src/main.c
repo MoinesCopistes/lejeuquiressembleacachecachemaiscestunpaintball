@@ -1,14 +1,24 @@
 #include <raylib.h>
-#include "geo.h"
 #include "world.h"
-int main(void)
+#include <networking.h>
+#include <stdio.h>
+
+int main(int argc, char** argv)
 {
+
+    if (argc == 1) {
+        printf("Starting a server...\n");
+        p_start_server();
+    } else {
+        printf("Starting a client...\n");
+        p_start_client();
+    }
     // Initialization
     //--------------------------------------------------------------------------------------
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
+    InitWindow(screenWidth, screenHeight, "paintball");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
