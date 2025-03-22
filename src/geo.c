@@ -19,6 +19,7 @@ int p_point_is_in_circle(Position *pos, Circle *circle)
 
 int p_circle_is_in_circle(Circle *circle1, Circle *circle2)
 {
+
     if(p_distance_position_square(&(circle1->pos), &(circle2->pos)) < (circle1->radius + circle2->radius)*(circle1->radius + circle2->radius))
         return 1;
     return 0;

@@ -36,6 +36,7 @@ struct Rect
 int p_point_is_in_rect(Position *pos, Rect *rect);
 int p_circle_is_in_rect(Circle *circle, Rect *rect);
 
+
 float p_fast_inverse_sqrt(float number);
 
 Position p_cast_vector_to_position(Vector2 vec);

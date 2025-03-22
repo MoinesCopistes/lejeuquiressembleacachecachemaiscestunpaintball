@@ -7,26 +7,28 @@
 #include <networking.h>
 #include <raylib.h>
 #include <stdio.h>
+#include "map.h"
 
-const int screenWidth = 1000;
-const int screenHeight = 600;
+
+/* GLOBAL VARIABLES */
+World world = {
+  .players = {NULL, NULL, NULL, NULL},
+  .entities = {NULL},
+  .playerID = 0,
+  .playersNumber = 1
+};
+
+const int screenWidth = screen_x;
+const int screenHeight = screen_y;
 enum game_states game_state = IN_MENU;
 
 PlayerPrey *players[4] = {NULL, NULL, NULL, NULL};
 float dt;
 
-// 0 is the server
-// if this game is a client, the server will
-// attribute a new playerID
-int playerID = 0;
-int playersNumber = 1;
 
 int main(int argc, char **argv) {
-  // Initialization
-  //--------------------------------------------------------------------------------------
-  // Removing raylib log
-  SetTraceLogLevel(LOG_NONE);
 
+  SetTraceLogLevel(LOG_NONE);
   if (argc == 1) {
     printf("Starting a server...\n");
     p_start_server();
@@ -47,7 +49,8 @@ int main(int argc, char **argv) {
 
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
-
+  Map* map = p_load_map("map.txt");
+  Texture2D text = p_assemble_atlas(map);
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
@@ -57,6 +60,7 @@ int main(int argc, char **argv) {
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
+    DrawTexture(text, 0, 0, WHITE);
     dt = GetFrameTime();
 
     switch (game_state) {
@@ -72,7 +76,7 @@ int main(int argc, char **argv) {
       break;
     case IN_GAME:
       if (IsKeyDown(KEY_W)) {
-        p_player_prey_move(players[playerID], &cursor_nul_de_tristan);
+        p_player_move((Player*)players[world.playerID], &cursor_nul_de_tristan);
       }
       // trucs
 
@@ -80,8 +84,8 @@ int main(int argc, char **argv) {
 
       for (int i = 0; i < 4; i++) {
         if (players[i] != NULL) {
-          DrawCircle((int)players[i]->hitbox.pos.x,
-                     (int)players[i]->hitbox.pos.y, players[i]->hitbox.radius,
+          DrawCircle((int)players[i]->p.hitbox.pos.x,
+                     (int)players[i]->p.hitbox.pos.y, players[i]->p.hitbox.radius,
                      DARKBLUE);
         }
       }
@@ -95,9 +99,9 @@ int main(int argc, char **argv) {
   // De-Initialization
   //--------------------------------------------------------------------------------------
   CloseWindow(); // Close window and OpenGL context
-  p_player_prey_free(players[0]);
-  p_player_prey_free(players[1]);
   free(menu_buttons);
+  // p_player_prey_free(world.players[0]);
+  // p_player_prey_free(world.players[1]);
   //--------------------------------------------------------------------------------------
 
   return 0;
