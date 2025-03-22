@@ -1,7 +1,6 @@
 #include "defines.h"
 #include "geo.h"
 #include "menu.h"
-#include "player.h"
 #include "world.h"
 #include <log.h>
 #include <networking.h>
@@ -22,7 +21,6 @@ const int screenWidth = screen_x;
 const int screenHeight = screen_y;
 enum game_states game_state = IN_MENU;
 
-Player *players[4] = {NULL, NULL, NULL, NULL};
 float dt;
 
 
@@ -76,19 +74,16 @@ int main(int argc, char **argv) {
       break;
     case IN_GAME:
       if (IsKeyDown(KEY_W)) {
-        printf("cursor x : %f\n", cursor_nul_de_tristan.x);
-        printf("world.playerID : %d\n", world.playerID);
-        printf("hitbox : %f\n", ((Player*)players[world.playerID])->hitbox.pos.x);
-        p_player_move(players[world.playerID], &cursor_nul_de_tristan);
+        p_player_move(world.players[world.playerID], &cursor_nul_de_tristan);
       }
       // trucs
 
       // p_player_prey_move(players[1],&cursor,time);
 
       for (int i = 0; i < 4; i++) {
-        if (players[i] != NULL) {
-          DrawCircle((int)players[i]->hitbox.pos.x,
-                     (int)players[i]->hitbox.pos.y, players[i]->hitbox.radius,
+        if (world.players[i] != NULL) {
+          DrawCircle((int)world.players[i]->hitbox.pos.x,
+                     (int)world.players[i]->hitbox.pos.y, world.players[i]->hitbox.radius,
                      DARKBLUE);
         }
       }
