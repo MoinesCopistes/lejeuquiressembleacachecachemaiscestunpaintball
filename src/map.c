@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "utils.c"
 #include "defines.h"
-
+#include <log.h>
 
 /**
  * @param path the path to the png file

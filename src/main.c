@@ -4,14 +4,17 @@
 #include <stdio.h>
 #include "map.h"
 
-PlayerPrey *players[4] = {NULL, NULL, NULL, NULL};
+
+/* GLOBAL VARIABLES */
+World world = {
+  .players = {NULL, NULL, NULL, NULL},
+  .entities = {NULL},
+  .playerID = 0,
+  .playersNumber = 1
+};
+
 float dt;
 
-// 0 is the server
-// if this game is a client, the server will
-// attribute a new playerID
-int playerID = 0;
-int playersNumber = 1;
 
 int main(int argc, char **argv) {
 
@@ -55,14 +58,14 @@ int main(int argc, char **argv) {
     // trucs
 
     if (IsKeyDown(KEY_W)) {
-      p_player_prey_move(players[playerID], &cursor);
+      p_player_move(world.players[world.playerID], &cursor);
     }
     // p_player_prey_move(players[1],&cursor,time);
 
     for (int i = 0; i < 4; i++) {
-      if (players[i] != NULL) {
-        DrawCircle((int)players[i]->hitbox.pos.x, (int)players[i]->hitbox.pos.y,
-                   players[i]->hitbox.radius, DARKBLUE);
+      if (world.players[i] != NULL) {
+        DrawCircle((int)world.players[i]->hitbox.pos.x, (int)world.players[i]->hitbox.pos.y,
+                   world.players[i]->hitbox.radius, DARKBLUE);
       }
 
     }
@@ -74,8 +77,8 @@ int main(int argc, char **argv) {
   // De-Initialization
   //--------------------------------------------------------------------------------------
   CloseWindow(); // Close window and OpenGL context
-  p_player_prey_free(players[0]);
-  p_player_prey_free(players[1]);
+  // p_player_prey_free(world.players[0]);
+  // p_player_prey_free(world.players[1]);
   //--------------------------------------------------------------------------------------
 
   return 0;
