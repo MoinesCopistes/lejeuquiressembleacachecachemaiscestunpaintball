@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+void p_change_state_to_in_game() { game_state = IN_GAME; }
+
 Button *p_init_buttons() {
   Button *buttons = malloc(sizeof(Button) * NUMBER_OF_MENU_BUTTONS);
   Texture2D button_background_texture =
@@ -31,7 +33,7 @@ Button *p_init_buttons() {
       0,
       4,
       "Start",
-      NULL,
+      p_change_state_to_in_game,
   };
 
   buttons[0] = start_button;
@@ -51,7 +53,7 @@ Button *p_init_buttons() {
       0,
       4,
       "Settings",
-      NULL,
+      p_change_state_to_in_game,
   };
   buttons[1] = settings_button;
 
@@ -70,7 +72,7 @@ Button *p_init_buttons() {
       0,
       4,
       "Look for IP",
-      NULL,
+      p_change_state_to_in_game,
   };
   buttons[2] = IP_button;
   return buttons;
@@ -129,11 +131,10 @@ void p_menu_check_inputs(Vector2 mouse_pos, Button *button) {
       button->current_frame = 2;
     else
       button->current_frame = 1;
+    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+      button->p_button_function();
+    }
 
   } else
     button->current_frame = 0;
-
-  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-    button->p_button_function();
-  }
 }
