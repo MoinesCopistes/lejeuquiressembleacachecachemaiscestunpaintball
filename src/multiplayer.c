@@ -4,6 +4,16 @@
 #include <player.h>
 #include <stdio.h>
 
+/*
+You MUST call this function to create any events.
+
+Usage:
+
+MyEvent* event = (MyEvent*) new_event(sizeof(MyEvent), MYEVENT_TYPE)
+
+This will set all mandatory fields on the event.
+
+*/
 Event *new_event(unsigned long size, enum EventType type) {
   Event *e = malloc(size);
   e->magic = 69;
@@ -14,6 +24,13 @@ Event *new_event(unsigned long size, enum EventType type) {
   return e;
 }
 
+
+/*
+This function will send HELLO event to the server
+and wait for the server to respond with a player id for our new client.
+This player id tells us how many players are already there
+so we can populate players[i] with those players + ourself.
+*/
 void init_multiplayer() {
   // Wait for the server to get a playerID
   if (!isServer) {
@@ -31,6 +48,16 @@ void init_multiplayer() {
   }
 }
 
+/*
+This function is called whenever a player (server or client)
+receives an event.
+
+However, clientID will always be -1 for clients as clients can only
+send messages to the server.
+
+But the server will have clientID set, allowing it to send events
+to particular clients in response of an event (cf EVENT_HELLO)
+*/
 void p_handle_event(Event *event, int clientID) {
   if (event->type == EVENT_HELLO && isServer) {
     log_info("New player detected. Giving a new playerID");

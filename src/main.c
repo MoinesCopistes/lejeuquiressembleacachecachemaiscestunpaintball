@@ -14,6 +14,8 @@ int playerID = 0;
 int playersNumber = 1;
 
 int main(int argc, char **argv) {
+  // Removing raylib log
+  SetTraceLogLevel(LOG_NONE);
 
   if (argc == 1) {
     printf("Starting a server...\n");

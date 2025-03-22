@@ -103,9 +103,9 @@ void *handle_recv(void *arg) {
     if (bytes_received <= 0) {
       // Client disconnected or error occurred
       if (bytes_received == 0) {
-        printf("Client disconnected\n");
+        log_error("Client disconnected\n");
       } else {
-        perror("recv failed");
+        log_error("recv failed");
       }
       break;
     }
@@ -125,7 +125,7 @@ void *handle_recv(void *arg) {
 
   // Close the client socket
   close(client_socket);
-  printf("Client connection closed\n");
+  log_error("Client connection closed\n");
   return NULL;
 }
 
@@ -162,7 +162,7 @@ void *server_main() {
     exit(EXIT_FAILURE);
   }
 
-  printf("Server is listening on port 8080...\n");
+  log_info("Server is listening on port 8080...\n");
 
   isConnected = 1;
   while (1) {
@@ -172,7 +172,7 @@ void *server_main() {
       continue; // Continue to accept other connections
     }
 
-    printf("New client connected\n");
+    log_info("New client connected\n");
     clients[connectedClients] = client_socket;
     clientsChan[connectedClients] = chan_init(0);
     HandleArgs *hsa = malloc(sizeof(HandleArgs));
@@ -221,10 +221,10 @@ void *client_main(void *data) {
   // socket create and verification
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd == -1) {
-    printf("socket creation failed...\n");
+    log_error("socket creation failed...\n");
     exit(0);
   } else
-    printf("Socket successfully created..\n");
+    log_info("Socket successfully created..\n");
   bzero(&servaddr, sizeof(servaddr));
 
   servaddr.sin_family = AF_INET;
@@ -232,10 +232,10 @@ void *client_main(void *data) {
   servaddr.sin_port = htons(8080);
 
   if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) != 0) {
-    printf("connection with the server failed...\n");
+    log_error("connection with the server failed...\n");
     exit(0);
   } else
-    printf("connected to the server..\n");
+    log_info("connected to the server..\n");
 
   HandleArgs *hsa = malloc(sizeof(HandleArgs));
   ss_chan = chan_init(0);
