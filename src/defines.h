@@ -22,3 +22,5 @@ typedef struct {
 typedef struct {
   Player* players;
 } World;
+
+extern float dt;

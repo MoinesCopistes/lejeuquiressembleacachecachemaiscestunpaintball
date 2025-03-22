@@ -1,12 +1,26 @@
 #include "entities.h"
 
+Entity* p_entity_create(EntityType type, unsigned long size)
+{
+    Entity *e = (Entity *) malloc(size);
+    e->type = type;
+    e->alive = 1;
+    return e;
+}
+
+void (*EntityUpdateFunctions[ENTITY_NUMBER])(Entity *entity) = {
+    p_paint_ball_update
+};
+
+void (*EntityFreeFunctions[ENTITY_NUMBER])(Entity *entity) = {
+    p_paint_ball_free
+};
+
 //Different entities
 
 Paint_ball* p_paint_ball_create(Position *start, Position *cursor, unsigned int iD, unsigned int player_id, float speed_coeff, float radius, float splash_radius, float max_dis_squared)
 {
-    Paint_ball *ball = (Paint_ball *) malloc(sizeof(Paint_ball));
-
-    ball->type = ENTITY_PAINT_BALL;
+    Paint_ball *ball = (Paint_ball *) p_entity_create(ENTITY_PAINT_BALL,sizeof(Paint_ball));
 
     ball->iD = iD;
     ball->player_id = player_id;
@@ -27,19 +41,21 @@ Paint_ball* p_paint_ball_create(Position *start, Position *cursor, unsigned int 
     return ball;
 }
 
-void p_paint_ball_free(Paint_ball *ball)
+void p_paint_ball_free(Entity *entity)
 {
+    Paint_ball *ball = (Paint_ball *) entity;
     free(ball);
 }
 
-void p_paint_ball_update(Paint_ball *ball, float time)
+void p_paint_ball_update(Entity *entity)
 {
-    float dx = ball->speed_x * time;
-    float dy = ball->speed_y * time;
+    Paint_ball *ball = (Paint_ball*) entity;
+    float dx = ball->speed_x * dt;
+    float dy = ball->speed_y * dt;
     ball->hitbox.pos.x += dx;
     ball->hitbox.pos.y += dy;
     ball->dis_squared += (dx * dx) + (dy * dy);    
-    ball->alive = ball->dis_squared < ball->max_dis_squared;
+    ball->e.alive = ball->dis_squared < ball->max_dis_squared;
 }
 
 //Entity tab
@@ -57,39 +73,16 @@ void p_entity_all_tab_free()
     for(unsigned int i = 0; i < OBJECT_LIMIT; ++i)
     {
         if(EntityTab[i] != NULL)
-        {
-            switch(EntityTab[i]->type)
-            {
-                case ENTITY_PAINT_BALL:
-                    Paint_ball* ball = (Paint_ball*) EntityTab[i];
-                    p_paint_ball_free(ball);
-                    EntityTab[i] = NULL;
-                    break;
-                default :
-                    printf("This entity type is not handled by p_entity_tab_free. PlsFix.\n");
-                    break;
-            }
-        }
+            EntityFreeFunctions[EntityTab[i]->type](EntityTab[i]);
     }
 }
 
-void p_entity_tab_update(float time)
+void p_entity_tab_update()
 {
     for(unsigned int i = 0; i < OBJECT_LIMIT; ++i)
     {
         if(EntityTab[i] != NULL)
-        {
-            switch(EntityTab[i]->type)
-            {
-                case ENTITY_PAINT_BALL:
-                    Paint_ball* ball = (Paint_ball*) EntityTab[i];
-                    p_paint_ball_update(ball,time);
-                    break;
-                default :
-                    printf("This entity type is not handled by p_entity_update.\n");
-                    break;
-            }
-        }
+            EntityUpdateFunctions[EntityTab[i]->type](EntityTab[i]);
     }
 }
 
@@ -123,19 +116,7 @@ void p_entity_tab_dead_free()
         if(EntityTab[i] != NULL)
         {
             if(EntityTab[i]->alive == 0)
-            {
-                switch(EntityTab[i]->type)
-                {
-                    case ENTITY_PAINT_BALL:
-                        Paint_ball* ball = (Paint_ball*) EntityTab[i];
-                        p_paint_ball_free(ball);
-                        EntityTab[i] = NULL;
-                        break;
-                    default :
-                        printf("This entity type is not handled by p_entity_tab_dead_free(). PlsFix.\n");
-                        break;
-                }
-            }
+                EntityFreeFunctions[EntityTab[i]->type](EntityTab[i]);
         }
     }
 }

@@ -1,3 +1,5 @@
+#include "defines.h"
+#include "geo.h"
 #include "player.h"
 #include "world.h"
 #include <log.h>
@@ -6,6 +8,7 @@
 #include <stdio.h>
 
 PlayerPrey *players[4] = {NULL, NULL, NULL, NULL};
+float dt;
 
 // 0 is the server
 // if this game is a client, the server will
@@ -39,32 +42,25 @@ int main(int argc, char **argv) {
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
 
-  // Init Players
-  Circle c1, c2;
-  c1.radius = 30;
-  c2.radius = 30;
-  c1.pos.x = 200;
-  c1.pos.y = 200;
-  c2.pos.x = 500;
-  c2.pos.y = 200;
-
-  // -------------------------------------------------------------------------------------
-
-  float time;
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
-
-    time = GetFrameTime();
+    ClearBackground(RAYWHITE);
+    dt = GetFrameTime();
     // Update
     //----------------------------------------------------------------------------------
     // TODO: Update your variables here
     //----------------------------------------------------------------------------------
 
-    // Draw
-    //----------------------------------------------------------------------------------
-    BeginDrawing();
-    ClearBackground(RAYWHITE);
+    Position cursor;
+    cursor.x = (float)GetMouseX();
+    cursor.y = (float)GetMouseY();
+    // trucs
+
+    if (IsKeyDown(KEY_W)) {
+      p_player_prey_move(players[playerID], &cursor);
+    }
+    // p_player_prey_move(players[1],&cursor,time);
 
     for (int i = 0; i < 4; i++) {
       if (players[i] != NULL) {
@@ -72,18 +68,6 @@ int main(int argc, char **argv) {
                    players[i]->hitbox.radius, DARKBLUE);
       }
     }
-
-    Position cursor;
-    cursor.x = (float)GetMouseX();
-    cursor.y = (float)GetMouseY();
-    // trucs
-
-    if (IsKeyDown(KEY_W))
-      p_player_prey_move(players[playerID], &cursor, time);
-    // p_player_prey_move(players[1],&cursor,time);
-
-    // DrawText("Congrats! You created your first window!", 190, 200, 20,
-    // LIGHTGRAY);
 
     EndDrawing();
     //----------------------------------------------------------------------------------

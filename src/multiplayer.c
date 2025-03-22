@@ -44,7 +44,7 @@ void init_multiplayer() {
 
   for (int i = 0; i <= playerID; i++) {
     Circle c = {{200 + 100 * i, 200}, 30};
-    players[i] = p_player_prey_create(i, 200, &c);
+    players[i] = p_player_prey_create(i, 400, &c);
   }
 }
 
@@ -72,7 +72,7 @@ void p_handle_event(Event *event, int clientID) {
     printf("Adding the %d player\n", newClientId);
     playersNumber++;
     Circle c = {{200 + 100 * newClientId, 200}, 30};
-    players[newClientId] = p_player_prey_create(newClientId, 200, &c);
+    players[newClientId] = p_player_prey_create(newClientId, 400, &c);
   }
 
   if (event->type == EVENT_ASSIGN_ID) {
