@@ -2,8 +2,10 @@
 #include "geo.h"
 #include "world.h"
 #include "player.h"
+#include "defines.h"
 
 PlayerPrey* players[2];
+float dt;
 
 int main(void)
 {
@@ -32,12 +34,11 @@ int main(void)
 
     // -------------------------------------------------------------------------------------
 
-    float time;
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
 
-        time = GetFrameTime();
+        dt = GetFrameTime();
         // Update
         //----------------------------------------------------------------------------------
         // TODO: Update your variables here
@@ -57,8 +58,8 @@ int main(void)
             //trucs
     
             if(IsKeyDown(KEY_W))
-                p_player_prey_move(players[0],&cursor,time);
-            //p_player_prey_move(players[1],&cursor,time);
+                p_player_prey_move(players[0],&cursor);
+            //p_player_prey_move(players[1],&cursor,dt);
 
             //DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
             

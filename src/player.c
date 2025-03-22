@@ -1,8 +1,8 @@
 #include "player.h"
 
-void p_paint_regen(PlayerHunter *hunter, float time)
+void p_paint_regen(PlayerHunter *hunter)
 {
-    hunter->paint_balls += hunter->paint_per_s * time;
+    hunter->paint_balls += hunter->paint_per_s * dt;
     if(hunter->paint_balls >= hunter->paint_balls_max)
         hunter->paint_balls = hunter->paint_balls_max;
 }
@@ -23,12 +23,12 @@ void p_player_prey_free(PlayerPrey *player)
     free(player);
 }
 
-void p_player_prey_move(PlayerPrey *player, Position *cursor, float time)
+void p_player_prey_move(PlayerPrey *player, Position *cursor)
 {
     float normal = p_fast_inverse_sqrt((cursor->x - player->hitbox.pos.x) * (cursor->x - player->hitbox.pos.x) + (cursor->y - player->hitbox.pos.y) * (cursor->y - player->hitbox.pos.y));
     if(normal < 0.3)
     {
-        player->hitbox.pos.x += player->speed * time * normal * (cursor->x - player->hitbox.pos.x);
-        player->hitbox.pos.y += player->speed * time * normal * (cursor->y - player->hitbox.pos.y);
+        player->hitbox.pos.x += player->speed * dt * normal * (cursor->x - player->hitbox.pos.x);
+        player->hitbox.pos.y += player->speed * dt * normal * (cursor->y - player->hitbox.pos.y);
     }
 }

@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "geo.h"
+#include "defines.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -16,7 +17,7 @@ struct PlayerHunter
     float paint_per_s; //regen rate
 };
 
-void p_paint_regen(PlayerHunter *hunter, float time);
+void p_paint_regen(PlayerHunter *hunter);
 
 typedef struct PlayerPrey PlayerPrey;
 struct PlayerPrey
@@ -28,7 +29,7 @@ struct PlayerPrey
 
 PlayerPrey* p_player_prey_create(unsigned int iD, float speed, Circle *hitbox);
 void p_player_prey_free(PlayerPrey *player);
-void p_player_prey_move(PlayerPrey *player, Position *cursor, float time);
+void p_player_prey_move(PlayerPrey *player, Position *cursor);
 
 
 
