@@ -32,10 +32,10 @@ void p_paint_ball_free(Paint_ball *ball)
     free(ball);
 }
 
-void p_paint_ball_update(Paint_ball *ball, clock_t time)
+void p_paint_ball_update(Paint_ball *ball, float time)
 {
-    float dx = ball->speed_x * (time / CLOCKS_PER_SEC);
-    float dy = ball->speed_y * (time / CLOCKS_PER_SEC);
+    float dx = ball->speed_x * time;
+    float dy = ball->speed_y * time;
     ball->hitbox.pos.x += dx;
     ball->hitbox.pos.y += dy;
     ball->dis_squared += (dx * dx) + (dy * dy);    
@@ -73,7 +73,7 @@ void p_entity_all_tab_free()
     }
 }
 
-void p_entity_tab_update(clock_t time)
+void p_entity_tab_update(float time)
 {
     for(unsigned int i = 0; i < OBJECT_LIMIT; ++i)
     {
