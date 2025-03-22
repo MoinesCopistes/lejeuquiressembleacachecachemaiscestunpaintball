@@ -1,4 +1,5 @@
 #pragma once
+#include "player.h"
 #include "raylib.h"
 #include "log.h"
 
@@ -13,16 +14,15 @@
 #define map_size_y 12
 #define screen_x map_size_x * tile_size
 #define screen_y map_size_y * tile_size
-
-
-
-
+#define MAX_CLIENT_NUMBER 4
 
 
 
 #define MACROVAR(name)      CONCAT(name, __LINE__)
 #define SCOPE(...)          for(int MACROVAR(_i_) = 0; !MACROVAR(_i_); ++MACROVAR(_i_), __VA_ARGS__)
 
+
+extern PlayerPrey *players[4];
 
 typedef struct {
     float x, y;
@@ -31,6 +31,7 @@ typedef struct {
 typedef struct {
     Player* players;
 } World;
+
 
 typedef struct {
     int x, y;
@@ -46,3 +47,6 @@ typedef struct {
     int rows;
     int cols;
 } Map;
+
+extern float dt;
+
