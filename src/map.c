@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include "utils.c"
 #include "defines.h"
-
+#include <string.h>
+#include <stdio.h>
+#include "log.h"
 
 /**
  * @param path the path to the png file
@@ -65,7 +67,7 @@ Image* _get_image(char input, TileSet* tileset){
     }
 }
 
-Tile** _get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col], TileSet** tileset){
+Tile** _get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col], TileSet* tileset){
     Tile** tiles = (Tile**) malloc(sizeof(Tile*) * n_row);
     if (tiles == NULL){log_error("Couldn't malloc Tile** in map.c");}
     for (int i = 0 ; i < n_row ; i++){
@@ -210,8 +212,6 @@ void p_map_free(Map* map, TileSet* tileset){
     free(map->tiles);
     
     map->tiles = NULL;
-    map->rows = NULL;
-    map->cols = NULL;
     map = NULL;
     for (int i = 0 ; i < tileset->n_image ; i++){
         UnloadImage(tileset->images[i]);
