@@ -3,6 +3,7 @@
 
 #include "geo.h"
 #include "entities.h"
+#include "defines.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,6 +19,7 @@ struct Player
     float orientation;
     PlayerType type;
     float accel_coeff;
+    int alive;
 };
 
 Player* p_player_create(PlayerType type, unsigned int iD, float speed, Circle *hitbox, unsigned long size);
@@ -50,5 +52,6 @@ PlayerPrey* p_player_prey_create(unsigned int iD, float speed, Circle *hitbox);
 void p_player_prey_free(PlayerPrey *player);
 
 void p_player_paint_ball_shoot(Player *player);
+void p_player_stab(Player *player);
 
 #endif

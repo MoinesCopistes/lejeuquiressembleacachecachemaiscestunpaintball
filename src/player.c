@@ -13,6 +13,7 @@ Player* p_player_create(PlayerType type, unsigned int iD, float speed, Circle *h
     p->type = type;
     p->accel_coeff = 0.2;
     p->orientation = 0.0;
+    p->alive = 1;
     return p;
 }
 
@@ -106,4 +107,33 @@ void p_player_paint_ball_shoot(Player *player)
     epm->max_dis_squared = 90000.0;
 
     broadcast_event((Event *)epm, -1);
+}
+
+void p_player_stab(Player *player)
+{
+    Circle stab_range;
+    stab_range.pos.x = player->hitbox.pos.x;
+    stab_range.pos.y = player->hitbox.pos.y;
+    stab_range.radius = player->hitbox.radius * 1.5;
+    for(unsigned int p = 0; p < 4; p++)
+    {
+        if(world.players[i] != player)
+        {
+            if(p_circle_is_in_circle(&stab_range, &(world.players[i]->hitbox)))  
+            {
+                float normal = p_fast_inverse_sqrt((world.players[i]->hitbox.pos.x - player->hitbox.pos.x) * (world.players[i]->hitbox.pos.x - player->hitbox.pos.x) + (world.players[i]->hitbox.pos.y - player->hitbox.pos.y) * (world.players[i]->hitbox.pos.y - player->hitbox.pos.y));
+                float cosine = (world.players[i]->hitbox.pos.x - player->hitbox.pos.x) * normal;
+                float sine = (world.players[i]->hitbox.pos.y - player->hitbox.pos.y) * normal;
+                float orientation;
+                if(sine > 0)
+                    orientation =  acos(cos) * 57.2957;
+                else
+                    orientation =  360.0 - (acos(cos) * 57.2957);
+
+                if(cos((orientation - player->orientation) / 57.2957) > 0.7071)
+                    world.players[i]->alive = 0;
+
+            } 
+        }
+    }
 }
