@@ -51,7 +51,6 @@ void init_multiplayer() {
   int *already_chosen = malloc(sizeof(int) * world.playersNumber);
   for (int i = 0; i <= world.playerID; i++) {
     Circle c;
-    printf("Map doesn't have a spawn point\n");
     Circle temp = {{200 + 100 * i, 200}, 30};
     c = temp;
     world.players[i] = (Player *)p_player_prey_create(i, 400, &c);

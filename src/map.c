@@ -219,7 +219,7 @@ Map *p_load_map(const char *path) {
   map->cols = n_col;
   map->rows = n_row;
   map->tileset = tileset;
-  log_debug("Map loaded: cols = %d, rows = %d", map->cols, map->rows);
+  log_debug("Map loaded: cols = %d, rows = %d, spawns = %d", map->cols, map->rows, map->spawn_points_n);
   return map;
 }
 
