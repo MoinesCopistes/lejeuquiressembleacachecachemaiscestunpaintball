@@ -116,15 +116,13 @@ void p_handle_event(Event *event, int clientID) {
     world.players[ekp->victim_iD]->alive = 0;
   }
 
-  if(event->type == EVENT_TAG_PLAYER)
-  {
-    EventTagPlayer *etp = (EventTagPlayer *) event;
+  if (event->type == EVENT_TAG_PLAYER) {
+    EventTagPlayer *etp = (EventTagPlayer *)event;
     world.players[etp->tagged_iD]->tagged = 1;
   }
 
-  if(event->type == EVENT_STAB && isServer)
-  {
-    EventStab *es = (EventStab *) event;
+  if (event->type == EVENT_STAB && isServer) {
+    EventStab *es = (EventStab *)event;
     p_stab_calculate_broadcast(es->stabber_id);
   }
 
@@ -139,8 +137,9 @@ void p_handle_event(Event *event, int clientID) {
   if (event->type == EVENT_SET_HUNTER) {
     int hunter = event->playerID;
     log_info("Player %d is the hunter\n", hunter);
-    free((PlayerPrey*)world.players[hunter]);
+    free((PlayerPrey *)world.players[hunter]);
     Circle c = {{0, 0}, 0};
-    world.players[hunter] = (Player*)p_player_hunter_create(hunter, 200, &c, 20, 20);
+    world.players[hunter] =
+        (Player *)p_player_hunter_create(hunter, 200, &c, 20, 20);
   }
 }

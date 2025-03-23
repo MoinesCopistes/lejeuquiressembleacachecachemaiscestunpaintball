@@ -21,6 +21,7 @@ typedef struct {
   Tile **tiles;
   int rows;
   int cols;
+  int spawn_points;
   TileSet *tileset;
 } Map;
 
