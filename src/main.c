@@ -49,8 +49,6 @@ int main(int argc, char **argv) {
 
   Map *map = p_load_map("map.txt");
   Sounds* sounds = p_init_sounds();
-  p_play_sound(sounds->sounds[0], (Vector2){0.0,0.0}, (Vector2){0.0,0.0});
-  // test_spatial();
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
@@ -150,5 +148,6 @@ int main(int argc, char **argv) {
   // p_player_prey_free(world.players[1]);
   //--------------------------------------------------------------------------------------
   p_free_map(map);
+  p_free_sounds(sounds);
   return 0;
 }
