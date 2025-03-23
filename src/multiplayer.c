@@ -1,5 +1,6 @@
 #include "defines.h"
 #include "log.h"
+#include "geo.h"
 #include "entities.h"
 #include <networking.h>
 #include <player.h>
@@ -96,7 +97,6 @@ void p_handle_event(Event *event, int clientID) {
   }
 
   if(event->type == EVENT_KILL_ENTITY) {
-    printf("RECEIVED\n");
     EventKillEntity *epm = (EventKillEntity *) event;
     for(unsigned int i = 0; i < OBJECT_LIMIT; ++i)
     {
@@ -106,6 +106,18 @@ void p_handle_event(Event *event, int clientID) {
                 EntityTab[i]->alive = 0;
         }
     }
+  }
+
+  if(event->type == EVENT_KILL_PLAYER)
+  {
+    EventKillPlayer *ekp = (EventKillPlayer *) event;
+    world.players[ekp->victim_iD]->alive = 0;
+  }
+
+  if(event->type == EVENT_STAB && isServer)
+  {
+    EventStab *es = (EventStab *) event;
+    p_stab_calculate_broadcast(es->stabber_id);
   }
 
 }

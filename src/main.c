@@ -69,8 +69,10 @@ int main(int argc, char **argv) {
 
     for (int i = 0; i < 4; i++) {
       if (world.players[i] != NULL) {
-        DrawCircle((int)world.players[i]->hitbox.pos.x, (int)world.players[i]->hitbox.pos.y,
-                   world.players[i]->hitbox.radius, DARKBLUE);
+        if(world.players[i]->alive)
+            DrawCircle((int)world.players[i]->hitbox.pos.x, (int)world.players[i]->hitbox.pos.y,world.players[i]->hitbox.radius, DARKBLUE);
+        else
+            DrawCircle((int)world.players[i]->hitbox.pos.x, (int)world.players[i]->hitbox.pos.y,world.players[i]->hitbox.radius, GREEN);
       }
     }
 
@@ -78,7 +80,6 @@ int main(int argc, char **argv) {
     {
         p_player_paint_ball_shoot(world.players[world.playerID]);
     }
-    printf("%u\n",p_entity_tab_size());
     
     p_entity_tab_update();
 
@@ -86,7 +87,10 @@ int main(int argc, char **argv) {
 
     p_entity_tab_dead_free();
 
-    
+    if(IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+    {
+        p_player_stab(world.players[world.playerID]);
+    }
 
     EndDrawing();
     //----------------------------------------------------------------------------------

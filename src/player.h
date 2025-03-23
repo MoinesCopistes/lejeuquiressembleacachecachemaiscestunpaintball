@@ -3,7 +3,6 @@
 
 #include "geo.h"
 #include "entities.h"
-#include "defines.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,6 +51,7 @@ PlayerPrey* p_player_prey_create(unsigned int iD, float speed, Circle *hitbox);
 void p_player_prey_free(PlayerPrey *player);
 
 void p_player_paint_ball_shoot(Player *player);
+void p_stab_calculate_broadcast(int iD);
 void p_player_stab(Player *player);
 
 #endif

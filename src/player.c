@@ -109,31 +109,48 @@ void p_player_paint_ball_shoot(Player *player)
     broadcast_event((Event *)epm, -1);
 }
 
-void p_player_stab(Player *player)
+void p_stab_calculate_broadcast(int iD)
 {
     Circle stab_range;
-    stab_range.pos.x = player->hitbox.pos.x;
-    stab_range.pos.y = player->hitbox.pos.y;
-    stab_range.radius = player->hitbox.radius * 1.5;
-    for(unsigned int p = 0; p < 4; p++)
+    stab_range.pos.x = world.players[iD]->hitbox.pos.x;
+    stab_range.pos.y = world.players[iD]->hitbox.pos.y;
+    stab_range.radius = world.players[iD]->hitbox.radius * 1.5;
+    for(unsigned int i = 0; i < 4; i++)
     {
-        if(world.players[i] != player)
+        if(i != iD && world.players[i] != NULL)
         {
             if(p_circle_is_in_circle(&stab_range, &(world.players[i]->hitbox)))  
             {
-                float normal = p_fast_inverse_sqrt((world.players[i]->hitbox.pos.x - player->hitbox.pos.x) * (world.players[i]->hitbox.pos.x - player->hitbox.pos.x) + (world.players[i]->hitbox.pos.y - player->hitbox.pos.y) * (world.players[i]->hitbox.pos.y - player->hitbox.pos.y));
-                float cosine = (world.players[i]->hitbox.pos.x - player->hitbox.pos.x) * normal;
-                float sine = (world.players[i]->hitbox.pos.y - player->hitbox.pos.y) * normal;
+                float normal = p_fast_inverse_sqrt((world.players[i]->hitbox.pos.x - world.players[iD]->hitbox.pos.x) * (world.players[i]->hitbox.pos.x - world.players[iD]->hitbox.pos.x) + (world.players[i]->hitbox.pos.y - world.players[iD]->hitbox.pos.y) * (world.players[i]->hitbox.pos.y - world.players[iD]->hitbox.pos.y)); //rofl
+                float cosine = (world.players[i]->hitbox.pos.x - world.players[iD]->hitbox.pos.x) * normal;
+                float sine = (world.players[i]->hitbox.pos.y - world.players[iD]->hitbox.pos.y) * normal;
                 float orientation;
                 if(sine > 0)
-                    orientation =  acos(cos) * 57.2957;
+                    orientation =  acos(cosine) * 57.2957;
                 else
-                    orientation =  360.0 - (acos(cos) * 57.2957);
+                    orientation =  360.0 - (acos(cosine) * 57.2957);
 
-                if(cos((orientation - player->orientation) / 57.2957) > 0.7071)
+                if(cos((orientation - world.players[iD]->orientation) / 57.2957) > 0.7071)
+                {
+                    EventKillPlayer *ekp = (EventKillPlayer*)new_event(sizeof(EventKillPlayer), EVENT_KILL_PLAYER);
+                    ekp->victim_iD = i;
+                    broadcast_event((Event *)ekp, -1);
                     world.players[i]->alive = 0;
+                }
 
             } 
         }
+    }
+}
+
+void p_player_stab(Player *player)
+{
+    if(isServer)
+        p_stab_calculate_broadcast(player->iD);
+    else
+    {
+        EventStab *es = (EventStab *)new_event(sizeof(EventStab),EVENT_STAB);
+        es->stabber_id = player->iD;
+        broadcast_event((Event *)es, -1);
     }
 }
