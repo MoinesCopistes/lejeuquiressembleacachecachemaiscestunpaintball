@@ -130,7 +130,6 @@ Map* p_load_map(const char* path){
     if (file == NULL) {log_error("File not found when trying to load the map");}
     x = 0;
     y = 0;
-    ch;
     while ((ch = fgetc(file)) != EOF) {
         if (ch == '\n') {
             y++;
