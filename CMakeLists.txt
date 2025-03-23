@@ -6,7 +6,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -ggdb -Wall")
 set(CMAKE_C_STANDARD 11)  
 # Add raylib
 option(BUILD_EXAMPLES "Build examples" OFF)
+# option(SUPPORT_MODULE_RAUDIO "Build RAudio" OFF)
 add_subdirectory(vendor/raylib)
+
 
 # Create the executable
 file(GLOB_RECURSE SOURCES src/**/*.c src/*.c)

@@ -56,6 +56,8 @@ Player *p_player_create(PlayerType type, unsigned int iD, float speed,
   p->accel_coeff = 0.2;
   p->orientation = 0.0;
   p->alive = 1;
+  p->tagged = 0;
+  p->timer = 0.0;
   return p;
 }
 
@@ -124,6 +126,26 @@ void p_player_move(Player *player, Position *cursor, Map *map) {
   }
 }
 
+void p_player_update_tagged()
+{
+    for(unsigned int i = 0; i < 4; ++i)
+    {
+        if(world.players[i] != NULL)
+        {
+            if(world.players[i]->tagged == 1)
+            {
+                world.players[i]->timer += dt;
+                if(world.players[i]->timer >= 10.0)
+                {
+                    world.players[i]->tagged = 0;
+                    world.players[i]->timer = 0.0;
+                }
+            }
+        }
+    }
+ 
+}
+
 void p_paint_regen(PlayerHunter *hunter) {
   hunter->paint_balls += hunter->paint_per_s * dt;
   if (hunter->paint_balls >= hunter->paint_balls_max)
@@ -170,7 +192,7 @@ void p_player_paint_ball_shoot(Player *player) {
   epm->player_id = player->iD;
   epm->speed_coeff = 1.0;
   epm->radius = 30;
-  epm->splash_radius = 30;
+  epm->splash_radius = 100;
   epm->max_dis_squared = 90000.0;
 
   broadcast_event((Event *)epm, -1);

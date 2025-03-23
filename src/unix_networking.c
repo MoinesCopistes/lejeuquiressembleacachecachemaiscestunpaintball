@@ -78,11 +78,13 @@ void *handle_send(void *arg) {
     chan_recv(chan, (void*)&msg);
     send(client_socket, msg, 1023, 0);
 
+    pthread_mutex_lock(&msg->memberCountMutex);
     msg->memberCount--;
     if (msg->memberCount == 0 && !msg->dont_free) {
-      // message sent one so we can free the event
+      
       free(msg);
     }
+    pthread_mutex_unlock(&msg->memberCountMutex);
   }
 
   return NULL;
@@ -96,7 +98,7 @@ void *handle_recv(void *arg) {
   int client_id = hsa->client_id;
 
   char buffer[1024];
-
+  printf("Buffer addr: %p\n", buffer);
   while (1) {
     // Receive data from the client
     ssize_t bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);

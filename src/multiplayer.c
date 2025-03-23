@@ -4,6 +4,7 @@
 #include "log.h"
 #include <networking.h>
 #include <player.h>
+#include <pthread.h>
 #include <stdio.h>
 
 /*
@@ -21,7 +22,8 @@ Event *new_event(unsigned long size, enum EventType type) {
   e->magic = 69;
   e->playerID = world.playerID;
   e->type = type;
-  e->memberCount = 1;
+  pthread_mutex_init(&e->memberCountMutex, NULL);
+  e->memberCount = 0;
   e->dont_free = 0;
   return e;
 }
@@ -114,8 +116,31 @@ void p_handle_event(Event *event, int clientID) {
     world.players[ekp->victim_iD]->alive = 0;
   }
 
-  if (event->type == EVENT_STAB && isServer) {
-    EventStab *es = (EventStab *)event;
+  if(event->type == EVENT_TAG_PLAYER)
+  {
+    EventTagPlayer *etp = (EventTagPlayer *) event;
+    world.players[etp->tagged_iD]->tagged = 1;
+  }
+
+  if(event->type == EVENT_STAB && isServer)
+  {
+    EventStab *es = (EventStab *) event;
     p_stab_calculate_broadcast(es->stabber_id);
+  }
+
+  if (event->type == EVENT_START) {
+    for (int i = 0; i < world.playersNumber; i++) {
+      Circle c = {{200 + 100 * i, 200}, 30};
+      world.players[i]->hitbox = c;
+    }
+    game_state = IN_GAME;
+  }
+
+  if (event->type == EVENT_SET_HUNTER) {
+    int hunter = event->playerID;
+    log_info("Player %d is the hunter\n", hunter);
+    free((PlayerPrey*)world.players[hunter]);
+    Circle c = {{0, 0}, 0};
+    world.players[hunter] = (Player*)p_player_hunter_create(hunter, 200, &c, 20, 20);
   }
 }

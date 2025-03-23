@@ -2,6 +2,7 @@
 #include "geo.h"
 #include "map.h"
 #include "menu.h"
+#include "player.h"
 #include "sound.h"
 #include "world.h"
 #include <ctype.h>
@@ -9,6 +10,8 @@
 #include <networking.h>
 #include <raylib.h>
 #include <stdio.h>
+#include "sound.h"
+
 /* GLOBAL VARIABLES */
 World world = {.players = {NULL, NULL, NULL, NULL},
                .entities = {NULL},
@@ -43,7 +46,8 @@ int main(int argc, char **argv) {
   InitAudioDevice();
   Button *menu_buttons = p_init_menu_buttons();
   Button *server_buttons = p_init_client_buttons();
-  Input *server_inputs = p_init_client_inputs();
+  Input *client_inputs = p_init_client_inputs();
+  Button *lobby_buttons = p_init_lobby_buttons();
   int focused_server_input = 0;
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
@@ -51,7 +55,8 @@ int main(int argc, char **argv) {
   Map *map = p_load_map("map.txt");
   world.map = map;
   Sounds *sounds = p_init_sounds();
-  p_play_sound(sounds->sounds[0], (Vector2){0.0, 0.0}, (Vector2){0.0, 0.0});
+
+
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
@@ -84,7 +89,7 @@ int main(int argc, char **argv) {
             (focused_server_input + 1) % NUMBER_OF_SERVER_INPUTS;
       }
       if (IsKeyPressed(KEY_BACKSPACE)) {
-        Input *i = &server_inputs[focused_server_input];
+        Input *i = &client_inputs[focused_server_input];
         i->content[i->cursor_pos] = 0;
         if (i->cursor_pos > -1)
           i->cursor_pos--;
@@ -92,7 +97,7 @@ int main(int argc, char **argv) {
 
       int key = GetCharPressed();
       if (key > 0 && isprint(key)) {
-        Input *i = &server_inputs[focused_server_input];
+        Input *i = &client_inputs[focused_server_input];
         i->cursor_pos++;
         if (i->cursor_pos >= 15) {
           i->cursor_pos--;
@@ -101,7 +106,7 @@ int main(int argc, char **argv) {
         }
       }
       for (int i = 0; i < NUMBER_OF_SERVER_INPUTS; i++) {
-        Input *input_ptr = &server_inputs[i];
+        Input *input_ptr = &client_inputs[i];
         p_draw_input(input_ptr, focused_server_input == i);
       }
 
@@ -113,6 +118,15 @@ int main(int argc, char **argv) {
         DrawText(t, 240 + 250 * i, 510, 25, WHITE);
       }
       DrawText("Waiting for others to join...", 300, 600, 50, WHITE);
+      if (isServer) {
+        for (int i = 0; i < NUMBER_OF_LOBBY_BUTTONS; i++) {
+          Button *button_ptr = &lobby_buttons[i];
+          p_button_check_inputs(cursor, button_ptr);
+          p_draw_button(button_ptr, WHITE, RED);
+        }
+
+        DrawText(menuError, 440, 200, 25, RED);
+      }
       break;
     case IN_GAME:
 
@@ -125,19 +139,41 @@ int main(int argc, char **argv) {
           p_player_send_event_player_move(world.players[world.playerID]);
       }
 
+      p_player_update_tagged();
+
       p_camera_follow();
       p_draw_map(map);
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
-          DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
-                     world.players[i]->hitbox.pos.y - world.offset.y,
-                     world.players[i]->hitbox.radius, DARKBLUE);
+          if (!world.players[i]->alive)
+            DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                       world.players[i]->hitbox.pos.y - world.offset.y,
+                       world.players[i]->hitbox.radius, GREEN);
+          else if (world.players[i]->tagged)
+            DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                       world.players[i]->hitbox.pos.y - world.offset.y,
+                       world.players[i]->hitbox.radius, YELLOW);
+          else {
+            if (world.players[i]->type == PLAYER_HUNTER) {
+              DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                         world.players[i]->hitbox.pos.y - world.offset.y,
+                         world.players[i]->hitbox.radius, RED);
+            } else if (world.players[world.playerID]->type != PLAYER_HUNTER) {
+              DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                         world.players[i]->hitbox.pos.y - world.offset.y,
+                         world.players[i]->hitbox.radius, DARKBLUE);
+            }
+          }
         }
       }
 
       if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         p_player_paint_ball_shoot(world.players[world.playerID]);
+      }
+
+      if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+        p_player_stab(world.players[world.playerID]);
       }
 
       p_entity_tab_update();
@@ -160,5 +196,6 @@ int main(int argc, char **argv) {
   // p_player_prey_free(world.players[1]);
   //--------------------------------------------------------------------------------------
   p_free_map(map);
+  p_free_sounds(sounds);
   return 0;
 }
