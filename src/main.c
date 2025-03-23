@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 
       break;
     case IN_GAME:
-      p_draw_map(map);
+      
       if (IsKeyDown(KEY_W)) {
         p_player_move(world.players[world.playerID], &cursor_nul_de_tristan);
       }
@@ -82,9 +82,11 @@ int main(int argc, char **argv) {
       // p_player_prey_move(players[1],&cursor,time);
 
       for (int i = 0; i < 4; i++) {
+
         if (world.players[i] != NULL) {
-          DrawCircle((int)world.players[i]->hitbox.pos.x,
-                     (int)world.players[i]->hitbox.pos.y, world.players[i]->hitbox.radius,
+          p_draw_map(map, (Vector2){(int)world.players[i]->hitbox.pos.x, (int)world.players[i]->hitbox.pos.y});
+          DrawCircle(screenWidth / 2,
+                     screenHeight / 2, world.players[i]->hitbox.radius,
                      DARKBLUE);
         }
       }
