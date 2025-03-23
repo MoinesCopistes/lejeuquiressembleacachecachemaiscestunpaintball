@@ -1,4 +1,5 @@
 #include "defines.h"
+#include "entities.h"
 #include "geo.h"
 #include "map.h"
 #include "menu.h"
@@ -7,6 +8,7 @@
 #include "world.h"
 #include <ctype.h>
 #include <log.h>
+#include <math.h>
 #include <networking.h>
 #include <raylib.h>
 #include <stdio.h>
@@ -53,6 +55,7 @@ int main(int argc, char **argv) {
 
   world.map = p_load_map("map.txt");
   Sounds *sounds = p_init_sounds();
+  Texture2D paint_ball_texture = LoadTexture("assets/paint_ball.png");
   Texture2D background = LoadTexture("assets/background.png");
   Texture2D red_ghost = LoadTexture("assets/red_ghost.png");
   Texture2D green_ghost = LoadTexture("assets/green_ghost.png");
@@ -160,6 +163,11 @@ int main(int argc, char **argv) {
       p_camera_follow();
       p_draw_map(world.map);
       p_update_players();
+      p_entity_tab_update();
+
+      p_entity_tab_draw_paint_balls(&paint_ball_texture);
+
+      p_entity_tab_dead_free();
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
@@ -224,11 +232,21 @@ int main(int argc, char **argv) {
         p_player_stab(world.players[world.playerID]);
       }
 
-      p_entity_tab_update();
+      PlayerHunter *ph = ((PlayerHunter *)world.players[world.hunterID]);
+      if (world.playerID == world.hunterID) {
+        for (int i = 0; i < ph->paint_balls_max; i++) {
+          Rectangle destination = {20 + i * PROJECTILE_SIZE, 20,
+                                   PROJECTILE_SIZE, PROJECTILE_SIZE};
+          Color c = WHITE;
+          if (i >= floor(ph->paint_balls)) {
+            c = GRAY;
+          }
+          p_draw_paintball(&paint_ball_texture, destination, c);
+        }
+      }
+      ph->paint_balls =
+          fmin(ph->paint_balls_max, ph->paint_balls + ph->paint_per_s * dt);
 
-      p_entity_tab_draw_paint_balls();
-
-      p_entity_tab_dead_free();
       break;
     }
 

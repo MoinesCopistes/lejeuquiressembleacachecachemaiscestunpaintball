@@ -157,7 +157,6 @@ void p_handle_event(Event *event, int clientID) {
         Circle temp = {{200 + 100 * i, 200}, 30};
         c = temp;
       }
-      world.players[i] = (Player *)p_player_prey_create(i, 400, &c);
       world.players[i]->hitbox = c;
     }
     free(already_chosen);
@@ -166,10 +165,10 @@ void p_handle_event(Event *event, int clientID) {
 
   if (event->type == EVENT_SET_HUNTER) {
     int hunter = event->playerID;
+    world.hunterID = hunter;
     log_info("Player %d is the hunter\n", hunter);
     free((PlayerPrey *)world.players[hunter]);
     Circle c = {{0, 0}, 0};
-    world.players[hunter] =
-        (Player *)p_player_hunter_create(hunter, 500, &c, 20, 20);
+    world.players[hunter] = (Player*)p_player_hunter_create(hunter, 500, &c, 20, 0.6);
   }
 }

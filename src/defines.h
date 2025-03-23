@@ -41,6 +41,7 @@ typedef struct {
   char *serverPort;
   Vector2 offset;
   Map* map;
+  int hunterID;
 } World;
 extern World world;
 extern Map *map;

@@ -191,11 +191,17 @@ void p_player_prey_free(PlayerPrey *player) { free(player); }
 
 void p_player_paint_ball_shoot(Player *player) {
 
+  if (player->type == PLAYER_PREY) {
+    return;
+  }
   if (p_entity_tab_is_full()) {
     printf("OBJECT LIMIT REACHED.\nNUKING.\n");
     exit(EXIT_FAILURE);
   }
-
+  PlayerHunter* ph = ((PlayerHunter*)world.players[world.hunterID]);
+  if (ph->paint_balls < 1) {
+    return;
+  }
   Paint_ball *ball =
       p_paint_ball_create(&(player->hitbox.pos), player->orientation,
                           player->iD, 1.0, 30, 30, 90000.0);
@@ -212,6 +218,7 @@ void p_player_paint_ball_shoot(Player *player) {
   epm->max_dis_squared = 90000.0;
 
   broadcast_event((Event *)epm, -1);
+  ph->paint_balls --;
 }
 
 void p_stab_calculate_broadcast(int iD) {

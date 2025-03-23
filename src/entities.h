@@ -8,6 +8,7 @@
 #include <math.h>
 #include <raylib.h>
 
+#define PROJECTILE_SIZE  40.0
 typedef enum {ENTITY_PAINT_BALL, ENTITY_NUMBER} EntityType;
 
 typedef struct Entity Entity;
@@ -59,8 +60,9 @@ int p_entity_tab_is_full();
 unsigned int p_entity_tab_size(); //renvoie combien d'éléments sont dans le tableau
 int p_entity_tab_add(Entity* entity);
 void p_entity_tab_dead_free(); //Pour free les éléments label en dead. ON FREE -> ON MET NULL 
+void p_entity_tab_draw_paint_balls(Texture2D* texture);
 
-void p_entity_tab_draw_paint_balls();
+void p_draw_paintball(Texture2D* texture, Rectangle destination, Color color);
 
 #endif
 
