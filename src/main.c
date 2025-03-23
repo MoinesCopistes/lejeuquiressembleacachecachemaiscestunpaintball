@@ -111,14 +111,6 @@ int main(int argc, char **argv) {
       }
       DrawText("Waiting for others to join...", 300, 600, 50, WHITE);
       break;
-    case IN_LOBBY:
-      for (int i = 0; i < world.playersNumber; i++) {
-        DrawCircle(250 + 250*i, 450, 50, BLUE);
-        char t[2] = {48+i, 0};
-        DrawText(t, 240+250*i, 510, 25, WHITE);
-      }
-      DrawText("Waiting for others to join...", 300, 600, 50, WHITE);
-      break;
     case IN_GAME:
 
       if (IsKeyDown(KEY_W)) {
