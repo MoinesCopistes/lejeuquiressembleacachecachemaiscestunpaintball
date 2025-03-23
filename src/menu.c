@@ -10,7 +10,6 @@ void p_change_state_to_in_game() {
   p_start_server();
   init_multiplayer();
   game_state = IN_GAME;
-
 }
 void p_change_state_to_in_menu() { game_state = IN_MENU; }
 void p_change_state_to_in_client() { game_state = IN_CLIENT; }
@@ -24,12 +23,29 @@ void p_try_to_connect() {
   while (!isConnected) {
   };
   if (isConnected == -1) {
-    sprintf(menuError, "Could not connect to %s:%s", world.serverAddress, world.serverPort);
+    sprintf(menuError, "Could not connect to %s:%s", world.serverAddress,
+            world.serverPort);
     isConnected = 0;
     return;
   }
   init_multiplayer();
   game_state = IN_LOBBY;
+}
+
+void p_launch_game() {
+  if (world.playersNumber == 1) {
+    sprintf(menuError, "You must be at least two players.");
+    return;
+  }
+  EventSetHunter *esh =
+      (EventSetHunter *)new_event(sizeof(EventSetHunter), EVENT_SET_HUNTER);
+  srand(time(NULL));
+  esh->playerID = rand() % (world.playersNumber);
+  p_handle_event(esh, -1);
+  broadcast_event(esh, -1);
+  EventStart *es = (EventStart *)new_event(sizeof(EventStart), EVENT_START);
+  p_handle_event(es, -1);
+  broadcast_event(es, -1);
 }
 
 Button *p_init_menu_buttons() {
@@ -154,6 +170,41 @@ Button *p_init_client_buttons() {
   };
 
   buttons[1] = back_button;
+  return buttons;
+}
+
+Button *p_init_lobby_buttons() {
+  Button *buttons = malloc(sizeof(Button) * NUMBER_OF_LOBBY_BUTTONS);
+  Texture2D button_background_texture =
+      LoadTexture("resources/button_background.png"); // Load button texture
+
+  // Define frame rectangle for drawing
+  float button_background_frame_height =
+      (float)button_background_texture.height / 3;
+  Rectangle button_background_source_rectangle = {
+      0, 0, (float)button_background_texture.width,
+      button_background_frame_height};
+
+  // Define button bounds on screen
+  Rectangle start_button_bounds = {
+      screenWidth / 2.0f - button_background_source_rectangle.width / 2.0f,
+      screenHeight / 2.0f - button_background_frame_height / 2.0f +
+          button_background_frame_height * 1.7 * 2,
+
+      (float)button_background_texture.width, button_background_frame_height};
+
+  Button start_button = {
+      button_background_texture,
+      button_background_source_rectangle,
+      start_button_bounds,
+      button_background_frame_height,
+      0,
+      4,
+      "Launch the game !",
+      p_launch_game,
+  };
+
+  buttons[0] = start_button;
   return buttons;
 }
 

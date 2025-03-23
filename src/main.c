@@ -2,6 +2,8 @@
 #include "geo.h"
 #include "map.h"
 #include "menu.h"
+#include "player.h"
+#include "sound.h"
 #include "world.h"
 #include <ctype.h>
 #include <log.h>
@@ -9,11 +11,13 @@
 #include <raylib.h>
 #include <stdio.h>
 #include "sound.h"
+
 /* GLOBAL VARIABLES */
 World world = {.players = {NULL, NULL, NULL, NULL},
                .entities = {NULL},
                .playerID = 0,
-               .playersNumber = 1};
+               .playersNumber = 1,
+               .offset = {0, 0}};
 
 const int screenWidth = screen_x;
 const int screenHeight = screen_y;
@@ -42,18 +46,22 @@ int main(int argc, char **argv) {
   InitAudioDevice();
   Button *menu_buttons = p_init_menu_buttons();
   Button *server_buttons = p_init_client_buttons();
-  Input *server_inputs = p_init_client_inputs();
+  Input *client_inputs = p_init_client_inputs();
+  Button *lobby_buttons = p_init_lobby_buttons();
   int focused_server_input = 0;
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
 
   Map *map = p_load_map("map.txt");
-  Sounds* sounds = p_init_sounds();
+  world.map = map;
+  Sounds *sounds = p_init_sounds();
+
+
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
     cursor = GetMousePosition();
-    Position cursor_nul_de_tristan = p_cast_vector_to_position(cursor);
+    Position cursor_pos_with_offset = cursor_with_offset(cursor);
 
     BeginDrawing();
 
@@ -81,7 +89,7 @@ int main(int argc, char **argv) {
             (focused_server_input + 1) % NUMBER_OF_SERVER_INPUTS;
       }
       if (IsKeyPressed(KEY_BACKSPACE)) {
-        Input *i = &server_inputs[focused_server_input];
+        Input *i = &client_inputs[focused_server_input];
         i->content[i->cursor_pos] = 0;
         if (i->cursor_pos > -1)
           i->cursor_pos--;
@@ -89,7 +97,7 @@ int main(int argc, char **argv) {
 
       int key = GetCharPressed();
       if (key > 0 && isprint(key)) {
-        Input *i = &server_inputs[focused_server_input];
+        Input *i = &client_inputs[focused_server_input];
         i->cursor_pos++;
         if (i->cursor_pos >= 15) {
           i->cursor_pos--;
@@ -98,41 +106,81 @@ int main(int argc, char **argv) {
         }
       }
       for (int i = 0; i < NUMBER_OF_SERVER_INPUTS; i++) {
-        Input *input_ptr = &server_inputs[i];
+        Input *input_ptr = &client_inputs[i];
         p_draw_input(input_ptr, focused_server_input == i);
       }
 
       break;
     case IN_LOBBY:
       for (int i = 0; i < world.playersNumber; i++) {
-        DrawCircle(250 + 250*i, 450, 50, BLUE);
-        char t[2] = {48+i, 0};
-        DrawText(t, 240+250*i, 510, 25, WHITE);
+        DrawCircle(250 + 250 * i, 450, 50, BLUE);
+        char t[2] = {48 + i, 0};
+        DrawText(t, 240 + 250 * i, 510, 25, WHITE);
       }
       DrawText("Waiting for others to join...", 300, 600, 50, WHITE);
+      if (isServer) {
+        for (int i = 0; i < NUMBER_OF_LOBBY_BUTTONS; i++) {
+          Button *button_ptr = &lobby_buttons[i];
+          p_button_check_inputs(cursor, button_ptr);
+          p_draw_button(button_ptr, WHITE, RED);
+        }
+
+        DrawText(menuError, 440, 200, 25, RED);
+      }
       break;
     case IN_GAME:
 
       if (IsKeyDown(KEY_W)) {
-        p_player_move(world.players[world.playerID], &cursor_nul_de_tristan);
+        p_player_move(world.players[world.playerID], &cursor_pos_with_offset,
+                      map);
+      } else {
+        if (p_player_update_orientation(world.players[world.playerID],
+                                        (Position *)&cursor_pos_with_offset))
+          p_player_send_event_player_move(world.players[world.playerID]);
       }
-      // trucs
 
-      // p_player_prey_move(players[1],&cursor,time);
+      p_player_update_tagged();
 
+      p_camera_follow();
+      p_draw_map(map);
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
-
-
-          p_draw_map(map, (Vector2){(int)world.players[i]->hitbox.pos.x, (int)world.players[i]->hitbox.pos.y});
-          DrawCircle(screenWidth / 2,
-                     screenHeight / 2, world.players[i]->hitbox.radius,
-                     DARKBLUE);
-
-
+          if (!world.players[i]->alive)
+            DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                       world.players[i]->hitbox.pos.y - world.offset.y,
+                       world.players[i]->hitbox.radius, GREEN);
+          else if (world.players[i]->tagged)
+            DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                       world.players[i]->hitbox.pos.y - world.offset.y,
+                       world.players[i]->hitbox.radius, YELLOW);
+          else {
+            if (world.players[i]->type == PLAYER_HUNTER) {
+              DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                         world.players[i]->hitbox.pos.y - world.offset.y,
+                         world.players[i]->hitbox.radius, RED);
+            } else if (world.players[world.playerID]->type != PLAYER_HUNTER) {
+              DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                         world.players[i]->hitbox.pos.y - world.offset.y,
+                         world.players[i]->hitbox.radius, DARKBLUE);
+            }
+          }
         }
       }
+
+      if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        p_player_paint_ball_shoot(world.players[world.playerID]);
+      }
+
+      if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+        p_player_stab(world.players[world.playerID]);
+      }
+
+      p_entity_tab_update();
+
+      p_entity_tab_draw_paint_balls();
+
+      p_entity_tab_dead_free();
       break;
     }
 

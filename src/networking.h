@@ -1,3 +1,4 @@
+#include <bits/pthreadtypes.h>
 #include <chan.h>
 #include <defines.h>
 int p_start_server();
@@ -18,16 +19,34 @@ enum EventType {
   EVENT_ASSIGN_ID,
 
   // message for player movement
-  EVENT_PLAYER_MOVE
+  EVENT_PLAYER_MOVE,
+
+  EVENT_PLAYER_SHOOT_PAINT_BALL,
+
+  EVENT_KILL_ENTITY, 
+
+  EVENT_STAB,
+
+  EVENT_KILL_PLAYER,
+
+  EVENT_TAG_PLAYER,
+
+  EVENT_START,
+  EVENT_SET_HUNTER
+
 };
 
 typedef struct {
   int magic; // always 69
   enum EventType type;
   int playerID;
+  pthread_mutex_t memberCountMutex;
   int memberCount;
   bool dont_free;
 } Event;
+
+typedef Event EventStart;
+typedef Event EventSetHunter;
 
 typedef struct {
   Event e;
@@ -38,7 +57,41 @@ typedef struct {
   Event e;
   float x;
   float y;
+  float orientation;
 } EventPlayerMove;
+
+typedef struct {
+  Event e;
+  Position start;
+  float orientation;
+  int player_id; //rofl
+  float speed_coeff;
+  float radius;
+  float splash_radius;
+  float max_dis_squared;
+} EventPlayerShootPaintBall;
+
+typedef struct {
+  Event e;
+  int iD;
+} EventKillEntity;
+
+typedef struct {
+  Event e;
+  int victim_iD;
+} EventKillPlayer;
+
+typedef struct {
+  Event e;
+  int tagged_iD;
+} EventTagPlayer;
+
+typedef struct {
+  Event e;
+  int stabber_id;
+} EventStab;
+
+
 
 void p_handle_event(Event *event, int clientID);
 
