@@ -84,9 +84,10 @@ def determine_texture(bordered, y, x):
     return '2'
 
 def texture_map(map_data):
-
+    # Add border
     bordered_map = add_border(map_data)
-
+    
+    # Convert to texture numbers
     textured_map = []
     for y in range(len(bordered_map)):
         new_row = []
@@ -97,7 +98,7 @@ def texture_map(map_data):
                 new_row.append(determine_texture(bordered_map, y, x))
         textured_map.append(''.join(new_row))
     
-
+    # Find all floor (empty space) positions
     floor_positions = []
     for y in range(1, len(textured_map)-1):
         for x in range(1, len(textured_map[y])-1):
@@ -105,50 +106,55 @@ def texture_map(map_data):
             if textured_map[y][x] == ' ':
                 floor_positions.append((y, x))
     
-
-    import random
-    if len(floor_positions) >= 4:
-
-        def distance(pos1, pos2):
-            return ((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)**0.5
-        
-        selected_positions = []
+    # Function to get distance between two positions
+    def distance(pos1, pos2):
+        return ((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)**0.5
+    
+    # Function to place special characters in well-spaced positions
+    def place_special_chars(positions, char, count, min_dist, all_special_positions):
+        import random
+        selected = []
         max_attempts = 100
-        min_distance = 8
         
-        while len(selected_positions) < 4 and max_attempts > 0:
-            candidate = random.choice(floor_positions)
+        while len(selected) < count and max_attempts > 0 and positions:
+            candidate = random.choice(positions)
             
+            # Check if candidate is far enough from all previously placed special characters
             is_far_enough = True
-            for pos in selected_positions:
-                if distance(candidate, pos) < min_distance:
+            for pos in all_special_positions:
+                if distance(candidate, pos) < min_dist:
                     is_far_enough = False
                     break
             
             if is_far_enough:
-                selected_positions.append(candidate)
-                floor_positions.remove(candidate)
+                selected.append(candidate)
+                all_special_positions.append(candidate)
+                positions.remove(candidate)
             
             max_attempts -= 1
         
-        while len(selected_positions) < 4 and floor_positions:
-            pos = random.choice(floor_positions)
-            selected_positions.append(pos)
-            floor_positions.remove(pos)
+        # If we couldn't find enough well-spaced positions, just pick random ones
+        while len(selected) < count and positions:
+            pos = random.choice(positions)
+            selected.append(pos)
+            all_special_positions.append(pos)
+            positions.remove(pos)
         
-        for y, x in selected_positions:
+        # Place the special characters
+        for y, x in selected:
             row_list = list(textured_map[y])
-            row_list[x] = '0'
+            row_list[x] = char
             textured_map[y] = ''.join(row_list)
+        
+        return selected
     
     import random
-    if len(floor_positions) >= 8:  # Need enough space for all special characters
+    if len(floor_positions) >= 24:  # Need enough space for all special characters (4+10+10)
         all_special_positions = []
-
+        
+        # Place special characters
         place_special_chars(floor_positions, '0', 4, 8, all_special_positions)
-
         place_special_chars(floor_positions, 'w', 10, 8, all_special_positions)
-
         place_special_chars(floor_positions, 'x', 10, 8, all_special_positions)
     
     return '\n'.join(textured_map)
