@@ -18,7 +18,15 @@ enum EventType {
   EVENT_ASSIGN_ID,
 
   // message for player movement
-  EVENT_PLAYER_MOVE
+  EVENT_PLAYER_MOVE,
+
+  EVENT_PLAYER_SHOOT_PAINT_BALL,
+
+  EVENT_KILL_ENTITY, 
+
+  EVENT_STAB, 
+
+  EVENT_KILL_PLAYER
 };
 
 typedef struct {
@@ -38,7 +46,34 @@ typedef struct {
   Event e;
   float x;
   float y;
+  float orientation;
 } EventPlayerMove;
+
+typedef struct {
+  Event e;
+  Position start;
+  float orientation;
+  int player_id; //rofl
+  float speed_coeff;
+  float radius;
+  float splash_radius;
+  float max_dis_squared;
+} EventPlayerShootPaintBall;
+
+typedef struct {
+  Event e;
+  int iD;
+} EventKillEntity;
+
+typedef struct {
+  Event e;
+  int victim_iD;
+} EventKillPlayer;
+
+typedef struct {
+  Event e;
+  int stabber_id;
+} EventStab;
 
 void p_handle_event(Event *event, int clientID);
 

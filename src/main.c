@@ -2,13 +2,13 @@
 #include "geo.h"
 #include "map.h"
 #include "menu.h"
+#include "sound.h"
 #include "world.h"
 #include <ctype.h>
 #include <log.h>
 #include <networking.h>
 #include <raylib.h>
 #include <stdio.h>
-#include "sound.h"
 /* GLOBAL VARIABLES */
 World world = {.players = {NULL, NULL, NULL, NULL},
                .entities = {NULL},
@@ -49,8 +49,9 @@ int main(int argc, char **argv) {
   //--------------------------------------------------------------------------------------
 
   Map *map = p_load_map("map.txt");
-  Sounds* sounds = p_init_sounds();
-  p_play_sound(sounds->sounds[0], (Vector2){0.0,0.0}, (Vector2){0.0,0.0});
+  world.map = map;
+  Sounds *sounds = p_init_sounds();
+  p_play_sound(sounds->sounds[0], (Vector2){0.0, 0.0}, (Vector2){0.0, 0.0});
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
@@ -118,29 +119,32 @@ int main(int argc, char **argv) {
       if (IsKeyDown(KEY_W)) {
         p_player_move(world.players[world.playerID], &cursor_pos_with_offset,
                       map);
+      } else {
+        if (p_player_update_orientation(world.players[world.playerID],
+                                        (Position *)&cursor_pos_with_offset))
+          p_player_send_event_player_move(world.players[world.playerID]);
       }
-      // trucs
-
-      // p_player_prey_move(players[1],&cursor,time);
 
       p_camera_follow();
       p_draw_map(map);
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
-          Rectangle rect = {CAMERA_BOUNDARIES, CAMERA_BOUNDARIES,
-                            screen_x - 2 * CAMERA_BOUNDARIES,
-                            screen_y - 2 * CAMERA_BOUNDARIES
-
-          };
-          p_camera_follow();
-          p_draw_map(map);
-          DrawCircle(
-              world.players[world.playerID]->hitbox.pos.x - world.offset.x,
-              world.players[world.playerID]->hitbox.pos.y - world.offset.y,
-              world.players[i]->hitbox.radius, DARKBLUE);
+          DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                     world.players[i]->hitbox.pos.y - world.offset.y,
+                     world.players[i]->hitbox.radius, DARKBLUE);
         }
       }
+
+      if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        p_player_paint_ball_shoot(world.players[world.playerID]);
+      }
+
+      p_entity_tab_update();
+
+      p_entity_tab_draw_paint_balls();
+
+      p_entity_tab_dead_free();
       break;
     }
 

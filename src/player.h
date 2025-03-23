@@ -13,11 +13,18 @@ struct Player {
   Circle hitbox;
   PlayerType type;
   float accel_coeff;
+  float orientation;
+  int alive;
 };
 
 Player *p_player_create(PlayerType type, unsigned int iD, float speed,
                         Circle *hitbox, unsigned long size);
 void p_player_move(Player *player, Position *cursor, Map *map);
+Player* p_player_create(PlayerType type, unsigned int iD, float speed, Circle *hitbox, unsigned long size);
+Player* p_player_create(PlayerType type, unsigned int iD, float speed, Circle *hitbox, unsigned long size);
+int p_player_update_orientation(Player *player, Position *cursor);
+void p_player_send_event_player_move(Player *player);
+void p_player_move(Player *player, Position *cursor, Map* map);
 
 typedef struct PlayerHunter PlayerHunter;
 struct PlayerHunter {
@@ -42,5 +49,9 @@ struct PlayerPrey {
 PlayerPrey *p_player_prey_create(unsigned int iD, float speed, Circle *hitbox);
 void p_player_prey_free(PlayerPrey *player);
 void p_camera_follow();
+
+void p_player_paint_ball_shoot(Player *player);
+void p_stab_calculate_broadcast(int iD);
+void p_player_stab(Player *player);
 
 #endif

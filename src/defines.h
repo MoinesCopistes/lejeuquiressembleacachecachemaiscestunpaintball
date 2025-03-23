@@ -36,5 +36,7 @@ typedef struct {
   char *serverAddress;
   char *serverPort;
   Vector2 offset;
+  Map* map;
 } World;
 extern World world;
+extern Map *map;
