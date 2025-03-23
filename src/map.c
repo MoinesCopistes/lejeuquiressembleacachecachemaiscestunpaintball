@@ -150,6 +150,7 @@ void p_draw_map(Map *map) {
 }
 
 Map *p_load_map(const char *path) {
+  //int result = system("python3 generator.py");
   FILE *file = fopen(path, "r");
   if (file == NULL) {
     log_error("File not found when trying to load the map");
