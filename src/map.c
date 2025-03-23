@@ -5,20 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define max(a, b)                                                              \
-  ({                                                                           \
-    __typeof__(a) _a = (a);                                                    \
-    __typeof__(b) _b = (b);                                                    \
-    _a > _b ? _a : _b;                                                         \
-  })
+#define max(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a > _b ? _a : _b; })
 
-int p_random_int(int min, int max) { return min + rand() % (max - min + 1); }
+int p_random_int(int min, int max) {
+    return min + rand() % (max - min + 1);
+}
 
-void _draw_tile(Tile tile, TileSet *tileset, float rot) {
-  DrawTexturePro(tileset->texture, tile.rect,
-                 (Rectangle){tile.pos.x * tile_size, tile.pos.y * tile_size,
-                             tile_size, tile_size},
-                 (Vector2){0, 0}, rot, WHITE);
+void _draw_tile(Tile tile, TileSet* tileset, Vector2 offset){
+    DrawTexturePro(tileset->texture, tile.rect, (Rectangle){tile.pos.x * tile_size, tile.pos.y * tile_size, tile_size, tile_size}, offset, 0, WHITE);
 }
 
 Rectangle _init_tile_rect(char id) {
@@ -116,13 +110,14 @@ Tile **_get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col],
   return tiles;
 }
 
-void p_draw_map(Map *map) {
-  for (int i = 0; i < map->rows; i++) {
-    for (int j = 0; j < map->cols; j++) {
-      _draw_tile(map->tiles[i][j], map->tileset, 0);
+void p_draw_map(Map* map, Vector2 offset){
+    for (int i = 0 ; i < map->rows; i++){
+        for (int j = 0 ; j < map->cols ; j++){
+            Tile tile = map->tiles[i][j];
+            _draw_tile(tile, map->tileset, offset);
+        }
     }
   }
-}
 
 Map *p_load_map(const char *path) {
   FILE *file = fopen(path, "r");

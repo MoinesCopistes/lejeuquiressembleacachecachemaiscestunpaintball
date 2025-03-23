@@ -71,7 +71,7 @@ void p_handle_event(Event *event, int clientID) {
 
   if (event->type == EVENT_HELLO) {
     int newClientId = world.playersNumber;
-    printf("Adding the %d player\n", newClientId);
+    log_info("Adding the player %d\n", newClientId);
     world.playersNumber++;
     Circle c = {{200 + 100 * newClientId, 200}, 30};
     world.players[newClientId] =
