@@ -10,7 +10,7 @@
 #define wall_color DARKGRAY
 #define texture_size 16
 #define texture_scale 4.0
-#define tile_size texture_scale * texture_size
+#define tile_size (texture_scale * texture_size)
 #define map_size_x 20
 #define map_size_y 12
 #define screen_x map_size_x * tile_size

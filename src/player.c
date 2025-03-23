@@ -3,19 +3,6 @@
 #include "networking.h"
 #include <stdio.h>
 
-Player *p_player_create(PlayerType type, unsigned int iD, float speed,
-                        Circle *hitbox, unsigned long size) {
-  Player *p = (Player *)malloc(size);
-  p->speed = speed;
-  p->iD = iD;
-  p->hitbox.pos.x = hitbox->pos.x;
-  p->hitbox.pos.y = hitbox->pos.y;
-  p->hitbox.radius = hitbox->radius;
-  p->type = type;
-  p->accel_coeff = 0.2;
-  return p;
-}
-
 
 #include <math.h>
 
@@ -61,27 +48,62 @@ void p_camera_follow() {
 }
 
 
+Player* p_player_create(PlayerType type, unsigned int iD, float speed, Circle *hitbox, unsigned long size)
+{
+    Player *p = (Player *) malloc(size);
+    p->speed = speed;
+    p->iD = iD;
+    p->hitbox.pos.x = hitbox->pos.x;
+    p->hitbox.pos.y = hitbox->pos.y;
+    p->hitbox.radius = hitbox->radius;
+    p->type = type;
+    p->accel_coeff = 0.2;
+    p->orientation = 0.0;
+    p->alive = 1;
+    return p;
+}
 
-
-void p_player_move(Player *player, Position *cursor) {
-  float normal = p_fast_inverse_sqrt(
+int p_player_update_orientation(Player *player, Position *cursor)
+{
+    float normal = p_fast_inverse_sqrt(
       (cursor->x - player->hitbox.pos.x) * (cursor->x - player->hitbox.pos.x) +
       (cursor->y - player->hitbox.pos.y) * (cursor->y - player->hitbox.pos.y));
-  if (normal < 0.3) {
-    player->hitbox.pos.x += player->speed * player->accel_coeff * dt * normal *
-                            (cursor->x - player->hitbox.pos.x);
-    player->hitbox.pos.y += player->speed * player->accel_coeff * dt * normal *
-                            (cursor->y - player->hitbox.pos.y);
-    player->accel_coeff += 0.1;
-    if (player->accel_coeff > 1.0)
-      player->accel_coeff = 1.0;
+    float new_orientation;
+    if(normal * (cursor->y - player->hitbox.pos.y) > 0)
+        new_orientation = acos(normal * (cursor->x - player->hitbox.pos.x)) * 57.2957; //radiants to degrees
+    else
+        new_orientation = 360.0 - (acos(normal * (cursor->x - player->hitbox.pos.x)) * 57.2957);
+    //printf("%f\n",epm->orientation)  ;  */
 
+    if(new_orientation == player->orientation)
+        return 0;
+    player->orientation = new_orientation;
+    return 1;
+}
+
+void p_player_send_event_player_move(Player *player)
+{
     EventPlayerMove *epm = (EventPlayerMove *)new_event(sizeof(EventPlayerMove),
                                                         EVENT_PLAYER_MOVE);
     epm->x = player->hitbox.pos.x;
     epm->y = player->hitbox.pos.y;
+    epm->orientation = player->orientation;
     broadcast_event((Event *)epm, -1);
+}
+
+void p_player_move(Player *player, Position *cursor) { //peux pas modifier car je dois checker si le centre de ma hitbox n'est pas sur la souris
+  float normal = p_fast_inverse_sqrt(
+      (cursor->x - player->hitbox.pos.x) * (cursor->x - player->hitbox.pos.x) +
+      (cursor->y - player->hitbox.pos.y) * (cursor->y - player->hitbox.pos.y));
+  if (normal < 0.3) {
+    player->hitbox.pos.x += player->speed * player->accel_coeff * dt * normal * (cursor->x - player->hitbox.pos.x);
+    player->hitbox.pos.y += player->speed * player->accel_coeff * dt * normal * (cursor->y - player->hitbox.pos.y);
+    player->accel_coeff += 0.1;
+    if (player->accel_coeff > 1.0)
+      player->accel_coeff = 1.0;
   }
+  p_player_update_orientation(player,cursor);
+  p_player_send_event_player_move(player);
 }
 
 void p_paint_regen(PlayerHunter *hunter) {
@@ -110,3 +132,73 @@ PlayerPrey *p_player_prey_create(unsigned int iD, float speed, Circle *hitbox) {
 }
 
 void p_player_prey_free(PlayerPrey *player) { free(player); }
+
+void p_player_paint_ball_shoot(Player *player)
+{
+    
+    if(p_entity_tab_is_full())
+    {
+        printf("OBJECT LIMIT REACHED.\nNUKING.\n");
+        exit(EXIT_FAILURE);
+    }       
+    
+    Paint_ball* ball = p_paint_ball_create(&(player->hitbox.pos), player->orientation, player->iD, 1.0, 30,30, 90000.0);
+    p_entity_tab_add((Entity*) ball);
+
+    EventPlayerShootPaintBall *epm = (EventPlayerShootPaintBall *)new_event(sizeof(EventPlayerShootPaintBall),EVENT_PLAYER_SHOOT_PAINT_BALL);
+    epm->start = player->hitbox.pos;
+    epm->orientation = player->orientation;
+    epm->player_id = player->iD;
+    epm->speed_coeff = 1.0;
+    epm->radius = 30;
+    epm->splash_radius = 30;
+    epm->max_dis_squared = 90000.0;
+
+    broadcast_event((Event *)epm, -1);
+}
+
+void p_stab_calculate_broadcast(int iD)
+{
+    Circle stab_range;
+    stab_range.pos.x = world.players[iD]->hitbox.pos.x;
+    stab_range.pos.y = world.players[iD]->hitbox.pos.y;
+    stab_range.radius = world.players[iD]->hitbox.radius * 1.5;
+    for(unsigned int i = 0; i < 4; i++)
+    {
+        if(i != iD && world.players[i] != NULL)
+        {
+            if(p_circle_is_in_circle(&stab_range, &(world.players[i]->hitbox)))  
+            {
+                float normal = p_fast_inverse_sqrt((world.players[i]->hitbox.pos.x - world.players[iD]->hitbox.pos.x) * (world.players[i]->hitbox.pos.x - world.players[iD]->hitbox.pos.x) + (world.players[i]->hitbox.pos.y - world.players[iD]->hitbox.pos.y) * (world.players[i]->hitbox.pos.y - world.players[iD]->hitbox.pos.y)); //rofl
+                float cosine = (world.players[i]->hitbox.pos.x - world.players[iD]->hitbox.pos.x) * normal;
+                float sine = (world.players[i]->hitbox.pos.y - world.players[iD]->hitbox.pos.y) * normal;
+                float orientation;
+                if(sine > 0)
+                    orientation =  acos(cosine) * 57.2957;
+                else
+                    orientation =  360.0 - (acos(cosine) * 57.2957);
+
+                if(cos((orientation - world.players[iD]->orientation) / 57.2957) > 0.7071)
+                {
+                    EventKillPlayer *ekp = (EventKillPlayer*)new_event(sizeof(EventKillPlayer), EVENT_KILL_PLAYER);
+                    ekp->victim_iD = i;
+                    broadcast_event((Event *)ekp, -1);
+                    world.players[i]->alive = 0;
+                }
+
+            } 
+        }
+    }
+}
+
+void p_player_stab(Player *player)
+{
+    if(isServer)
+        p_stab_calculate_broadcast(player->iD);
+    else
+    {
+        EventStab *es = (EventStab *)new_event(sizeof(EventStab),EVENT_STAB);
+        es->stabber_id = player->iD;
+        broadcast_event((Event *)es, -1);
+    }
+}

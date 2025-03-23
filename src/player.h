@@ -2,6 +2,10 @@
 #define PLAYER_H
 
 #include "geo.h"
+#include "entities.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 typedef enum {PLAYER_HUNTER, PLAYER_PREY} PlayerType;
 
@@ -11,11 +15,15 @@ struct Player
     float speed; //pas en global pour les futurs powerups
     unsigned int iD;
     Circle hitbox;
+    float orientation;
     PlayerType type;
     float accel_coeff;
+    int alive;
 };
 
 Player* p_player_create(PlayerType type, unsigned int iD, float speed, Circle *hitbox, unsigned long size);
+int p_player_update_orientation(Player *player, Position *cursor);
+void p_player_send_event_player_move(Player *player);
 void p_player_move(Player *player, Position *cursor);
 
 typedef struct PlayerHunter PlayerHunter;
@@ -43,6 +51,8 @@ PlayerPrey* p_player_prey_create(unsigned int iD, float speed, Circle *hitbox);
 void p_player_prey_free(PlayerPrey *player);
 void p_camera_follow();
 
-
+void p_player_paint_ball_shoot(Player *player);
+void p_stab_calculate_broadcast(int iD);
+void p_player_stab(Player *player);
 
 #endif
