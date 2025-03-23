@@ -46,8 +46,9 @@ int main(int argc, char **argv) {
   int focused_server_input = 0;
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
-  Map* map = p_load_map("map.txt");
-  
+
+  Map *map = p_load_map("map.txt");
+
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
@@ -57,6 +58,7 @@ int main(int argc, char **argv) {
     BeginDrawing();
 
     ClearBackground(PURPLE);
+
     dt = GetFrameTime();
 
     switch (game_state) {
@@ -109,8 +111,16 @@ int main(int argc, char **argv) {
       }
       DrawText("Waiting for others to join...", 300, 600, 50, WHITE);
       break;
+    case IN_LOBBY:
+      for (int i = 0; i < world.playersNumber; i++) {
+        DrawCircle(250 + 250*i, 450, 50, BLUE);
+        char t[2] = {48+i, 0};
+        DrawText(t, 240+250*i, 510, 25, WHITE);
+      }
+      DrawText("Waiting for others to join...", 300, 600, 50, WHITE);
+      break;
     case IN_GAME:
-      p_draw_map(map);
+
       if (IsKeyDown(KEY_W)) {
         p_player_move(world.players[world.playerID], &cursor_nul_de_tristan);
       }
@@ -119,10 +129,16 @@ int main(int argc, char **argv) {
       // p_player_prey_move(players[1],&cursor,time);
 
       for (int i = 0; i < 4; i++) {
+
         if (world.players[i] != NULL) {
-          DrawCircle((int)world.players[i]->hitbox.pos.x,
-                     (int)world.players[i]->hitbox.pos.y,
-                     world.players[i]->hitbox.radius, DARKBLUE);
+
+
+          p_draw_map(map, (Vector2){(int)world.players[i]->hitbox.pos.x, (int)world.players[i]->hitbox.pos.y});
+          DrawCircle(screenWidth / 2,
+                     screenHeight / 2, world.players[i]->hitbox.radius,
+                     DARKBLUE);
+
+
         }
       }
       break;

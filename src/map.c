@@ -10,8 +10,8 @@ int p_random_int(int min, int max) {
     return min + rand() % (max - min + 1);
 }
 
-void _draw_tile(Tile tile, TileSet* tileset){
-    DrawTexturePro(tileset->texture, tile.rect, (Rectangle){tile.pos.x * tile_size, tile.pos.y * tile_size, tile_size, tile_size}, (Vector2){0,0}, 0, WHITE);
+void _draw_tile(Tile tile, TileSet* tileset, Vector2 offset){
+    DrawTexturePro(tileset->texture, tile.rect, (Rectangle){tile.pos.x * tile_size, tile.pos.y * tile_size, tile_size, tile_size}, offset, 0, WHITE);
 }
 
 Rectangle _init_tile_rect(char id) {
@@ -95,11 +95,11 @@ Tile** _get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col], TileS
     return tiles;
 }
 
-void p_draw_map(Map* map){
+void p_draw_map(Map* map, Vector2 offset){
     for (int i = 0 ; i < map->rows; i++){
         for (int j = 0 ; j < map->cols ; j++){
             Tile tile = map->tiles[i][j];
-            _draw_tile(tile, map->tileset);
+            _draw_tile(tile, map->tileset, offset);
         }
     }
 }
