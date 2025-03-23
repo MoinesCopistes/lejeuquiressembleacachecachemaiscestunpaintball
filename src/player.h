@@ -53,7 +53,7 @@ struct PlayerPrey {
 
 PlayerPrey *p_player_prey_create(unsigned int iD, float speed, Circle *hitbox);
 void p_player_prey_free(PlayerPrey *player);
-void p_camera_follow();
+void p_camera_follow(int iD);
 
 void p_player_paint_ball_shoot(Player *player);
 void p_stab_calculate_broadcast(int iD);

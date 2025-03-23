@@ -18,7 +18,8 @@ World world = {.players = {NULL, NULL, NULL, NULL},
                .entities = {NULL},
                .playerID = 0,
                .playersNumber = 1,
-               .offset = {0, 0}};
+               .offset = {0, 0},
+               .timer = 0.0};
 
 const int screenWidth = screen_x;
 const int screenHeight = screen_y;
@@ -26,8 +27,29 @@ enum game_states game_state = IN_MENU;
 char menuError[256] = {0};
 float dt;
 
+char chrono[10];
+void p_time_to_str(float time, char *str) {
+  int minutes = (int)(time / 60.0);
+  int seconds = (int)(time - minutes * 60.0);
+  sprintf(str, "%d:%d", minutes, seconds);
+}
+
+int hunterId() {
+  int hunterId;
+  if (world.players[world.playerID]->type == PLAYER_HUNTER)
+    hunterId = world.playerID;
+  else {
+    for (unsigned int i = 0; i < 4; ++i) {
+      if (world.players[i] != NULL) {
+        if (world.players[i]->type == PLAYER_HUNTER)
+          hunterId = i;
+      }
+    }
+  }
+  return hunterId;
+}
+
 int main(int argc, char **argv) {
-  printf("%fl %fl\n", screen_x, screen_y);
   SetTraceLogLevel(LOG_NONE);
   // if (argc == 1) {
   //   printf("Starting a server...\n");
@@ -62,6 +84,9 @@ int main(int argc, char **argv) {
   Texture2D yellow_ghost = LoadTexture("assets/yellow_ghost.png");
   Texture2D blue_ghost = LoadTexture("assets/blue_ghost.png");
   Texture2D ghosts[4] = {green_ghost, blue_ghost, yellow_ghost, red_ghost};
+  Texture2D background_hunter =
+      LoadTexture("assets/background_hunter_winar.png");
+  Texture2D background_prey = LoadTexture("assets/background_prey_winar.png");
   Music music_calm = LoadMusicStream("assets/sound/music_calm.mp3");
   Music music_pursuit = LoadMusicStream("assets/sound/music_pursuit.mp3");
   Music *mu = &music_calm;
@@ -148,7 +173,6 @@ int main(int argc, char **argv) {
       }
       break;
     case IN_GAME:
-
       if (IsKeyDown(KEY_W)) {
         p_player_move(world.players[world.playerID], &cursor_pos_with_offset,
                       world.map);
@@ -156,12 +180,27 @@ int main(int argc, char **argv) {
         if (p_player_update_orientation(world.players[world.playerID],
                                         (Position *)&cursor_pos_with_offset))
           p_player_send_event_player_move(world.players[world.playerID]);
+        if (world.players[world.playerID]->alive) {
+          if (IsKeyDown(KEY_W)) {
+            p_player_move(world.players[world.playerID],
+                          &cursor_pos_with_offset, world.map);
+          } else {
+            if (p_player_update_orientation(
+                    world.players[world.playerID],
+                    (Position *)&cursor_pos_with_offset))
+              p_player_send_event_player_move(world.players[world.playerID]);
+          }
+        }
       }
 
       p_player_update_tagged();
 
-      p_camera_follow();
       p_draw_map(world.map);
+      if (world.players[world.playerID]->alive)
+        p_camera_follow(world.playerID);
+      else
+        p_camera_follow(world.hunterID);
+
       p_update_players();
       p_entity_tab_update();
 
@@ -196,8 +235,14 @@ int main(int argc, char **argv) {
         }
       }
 
-      enum music_states music_state2 = MUSIC_CALM; // rofl
+      p_time_to_str(180.0 - world.timer, chrono);
+      DrawText(chrono, 1100, 50, 40, WHITE);
 
+      if (!world.players[world.playerID]->alive) {
+        DrawText("You are dead.", 400, 100, 70, WHITE);
+      }
+
+      enum music_states music_state2 = MUSIC_CALM; // rofl
       if (world.players[world.playerID]->type == PLAYER_HUNTER) {
         for (int i = 0; i < 4; i++) {
           if (world.players[i] != NULL) {
@@ -222,14 +267,45 @@ int main(int argc, char **argv) {
         else
           mu = &music_pursuit;
         PlayMusicStream(*mu);
+      } else {
+        if (world.players[world.playerID]->alive &&
+            world.players[world.playerID]->tagged)
+          music_state2 = MUSIC_PURSUIT;
       }
 
-      if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        p_player_paint_ball_shoot(world.players[world.playerID]);
+      // printf("%d %d\n",music_state,music_state2);
+      if (music_state != music_state2) {
+        StopMusicStream(*mu);
+        music_state = music_state2;
+        if (music_state == MUSIC_CALM)
+          mu = &music_calm;
+        else
+          mu = &music_pursuit;
+        PlayMusicStream(*mu);
+      } else {
+        if (world.players[world.playerID]->alive &&
+            world.players[world.playerID]->tagged)
+          music_state2 = MUSIC_PURSUIT;
       }
 
-      if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-        p_player_stab(world.players[world.playerID]);
+      if (music_state != music_state2) {
+        StopMusicStream(*mu);
+        music_state = music_state2;
+        if (music_state == MUSIC_CALM)
+          mu = &music_calm;
+        else
+          mu = &music_pursuit;
+        PlayMusicStream(*mu);
+      }
+
+      if (world.players[world.playerID]->type == PLAYER_HUNTER) {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+          p_player_paint_ball_shoot(world.players[world.playerID]);
+        }
+
+        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+          p_player_stab(world.players[world.playerID]);
+        }
       }
 
       PlayerHunter *ph = ((PlayerHunter *)world.players[world.hunterID]);
@@ -247,6 +323,33 @@ int main(int argc, char **argv) {
       ph->paint_balls =
           fmin(ph->paint_balls_max, ph->paint_balls + ph->paint_per_s * dt);
 
+      p_entity_tab_update();
+
+      p_entity_tab_draw_paint_balls(&paint_ball_texture);
+
+      p_entity_tab_dead_free();
+
+      bool check = true;
+      for (unsigned int i = 0; i < 4; ++i) {
+        if (world.players[i] != NULL) {
+          if (world.players[i]->type == PLAYER_PREY && world.players[i]->alive)
+            check = false;
+        }
+      }
+      if (check)
+        game_state = IN_HUNTER_WON; // on laisse le heavy metal parce que rigolo
+
+      world.timer += dt;
+      if (world.timer >= 180.0)
+        game_state = IN_PREY_WON;
+
+      break;
+
+    case IN_HUNTER_WON:
+      DrawTexture(background_hunter, 0, 0, WHITE);
+      break;
+    case IN_PREY_WON:
+      DrawTexture(background_prey, 0, 0, WHITE);
       break;
     }
 
