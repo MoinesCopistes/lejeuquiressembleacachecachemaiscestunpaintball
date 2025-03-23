@@ -54,6 +54,11 @@ int main(int argc, char **argv) {
   world.map = p_load_map("map.txt");
   Sounds *sounds = p_init_sounds();
   Texture2D background = LoadTexture("assets/background.png");
+  Texture2D red_ghost = LoadTexture("assets/red_ghost.png");
+  Texture2D green_ghost = LoadTexture("assets/green_ghost.png");
+  Texture2D yellow_ghost = LoadTexture("assets/yellow_ghost.png");
+  Texture2D blue_ghost = LoadTexture("assets/blue_ghost.png");
+  Texture2D ghosts[4] = {green_ghost, blue_ghost, yellow_ghost, red_ghost};
   Music music_calm = LoadMusicStream("assets/sound/music_calm.mp3");
   Music music_pursuit = LoadMusicStream("assets/sound/music_pursuit.mp3");
   Music *mu = &music_calm;
@@ -64,9 +69,8 @@ int main(int argc, char **argv) {
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
 
-    //printf("%p\n",mu);
+    // printf("%p\n",mu);
     UpdateMusicStream(*mu);
-
 
     cursor = GetMousePosition();
     Position cursor_pos_with_offset = cursor_with_offset(cursor);
@@ -124,7 +128,8 @@ int main(int argc, char **argv) {
     case IN_LOBBY:
       DrawTexture(background, 0, 0, WHITE);
       for (int i = 0; i < world.playersNumber; i++) {
-        DrawCircle(250 + 250 * i, 450, 50, PURPLE);
+        DrawTexture(ghosts[i], 250 + 250 * i - 64, 450 - 64, WHITE);
+
         char t[2] = {48 + i, 0};
         DrawText(t, 240 + 250 * i, 510, 25, BLACK);
       }
@@ -173,46 +178,42 @@ int main(int argc, char **argv) {
                          world.players[i]->hitbox.pos.y - world.offset.y,
                          world.players[i]->hitbox.radius, RED);
             } else if (world.players[world.playerID]->type != PLAYER_HUNTER) {
-              DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
-                         world.players[i]->hitbox.pos.y - world.offset.y,
-                         world.players[i]->hitbox.radius, DARKBLUE);
+
+              DrawTexture(ghosts[i],
+                          world.players[i]->hitbox.pos.x - world.offset.x - 64,
+                          world.players[i]->hitbox.pos.y - world.offset.y - 64,
+                          WHITE);
             }
           }
         }
       }
 
-      enum music_states music_state2 = MUSIC_CALM; //rofl
+      enum music_states music_state2 = MUSIC_CALM; // rofl
 
-      if (world.players[world.playerID]->type == PLAYER_HUNTER)
-      {
-        for (int i = 0; i < 4; i++){
-            if(world.players[i] != NULL)
-            {
-                printf("%d\n", world.players[i]->alive);
-                if(world.players[i]->alive && world.players[i]->tagged)
-                {
-                    music_state2 = MUSIC_PURSUIT;
-                }
+      if (world.players[world.playerID]->type == PLAYER_HUNTER) {
+        for (int i = 0; i < 4; i++) {
+          if (world.players[i] != NULL) {
+            printf("%d\n", world.players[i]->alive);
+            if (world.players[i]->alive && world.players[i]->tagged) {
+              music_state2 = MUSIC_PURSUIT;
             }
+          }
         }
-      }
-      else
-      {
-        if(world.players[world.playerID]->alive && world.players[world.playerID]->tagged)
-            music_state2 = MUSIC_PURSUIT;
+      } else {
+        if (world.players[world.playerID]->alive &&
+            world.players[world.playerID]->tagged)
+          music_state2 = MUSIC_PURSUIT;
       }
 
-
-      //printf("%d %d\n",music_state,music_state2);
-      if(music_state != music_state2)
-      {
-         StopMusicStream(*mu);
-         music_state = music_state2;
-         if(music_state == MUSIC_CALM)
-            mu = &music_calm;
-         else
-            mu = &music_pursuit;
-         PlayMusicStream(*mu);
+      // printf("%d %d\n",music_state,music_state2);
+      if (music_state != music_state2) {
+        StopMusicStream(*mu);
+        music_state = music_state2;
+        if (music_state == MUSIC_CALM)
+          mu = &music_calm;
+        else
+          mu = &music_pursuit;
+        PlayMusicStream(*mu);
       }
 
       if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
