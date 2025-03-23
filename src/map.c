@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <string.h>  
 #define max(a, b)                                                              \
   ({                                                                           \
     __typeof__(a) _a = (a);                                                    \
@@ -23,6 +23,11 @@ void _draw_tile(Tile tile, TileSet *tileset, Vector2 offset) {
         DrawTexturePro(tileset->texture, tile.rect,
                        (Rectangle){draw_x, draw_y, tile_size, tile_size},
                        (Vector2){0, 0}, 0, WHITE);
+        if (tile.accessory.height != 0){
+          DrawTexturePro(tileset->texture, tile.accessory,
+            (Rectangle){draw_x, draw_y, tile_size, tile_size},
+            (Vector2){0, 0}, 0, WHITE);
+        }
     }
 }
 
@@ -63,9 +68,13 @@ Rectangle _init_tile_rect(char id) {
     return (Rectangle){3 * 16, 5 * 16, texture_size, texture_size};
   case 's':
     return (Rectangle){0, 5 * 16, texture_size, texture_size};
+  case 'P':
+    return (Rectangle){0, 10 * 16, texture_size, texture_size};
+  case 'O':
+    return (Rectangle){16, 9 * 16, texture_size, texture_size};
   default:
     log_error("Unknown tile character: %c", id);
-    return (Rectangle){0, 0, tile_size, tile_size}; // Default rectangle
+    return (Rectangle){16, 16, texture_size, texture_size}; // Default rectangle
   }
 }
 Tile _init_tile(char id, Coordinate pos) {
@@ -73,6 +82,12 @@ Tile _init_tile(char id, Coordinate pos) {
   tile->id = id;
   tile->pos = pos;
   tile->rect = _init_tile_rect(id);
+  const char* specials = "PO";
+  if (strchr(specials, id) != NULL){
+    tile->accessory = _init_tile_rect(" ");
+  } else {
+    tile->accessory = (Rectangle){0,0,0,0};
+  }
   return *tile;
 }
 
@@ -152,14 +167,19 @@ Map *p_load_map(const char *path) {
     x = 0;
     y = 0;
     while ((ch = fgetc(file)) != EOF) {
-        if (ch == '\n') {
-            y++;
-            x = 0;
-        } else {
-            chars[y][x] = ch;
-            x++;
-        }
-    }
+      if (ch == '\n') {
+          printf("End of row %d\n", y);
+          y++;
+          x = 0;
+      } else if (ch == '\r' || ch == ' ' || ch == '\t') {
+          // Skip carriage returns, spaces, and tabs
+          continue;
+      } else {
+          chars[y][x] = ch;
+          printf("Read character '%c' at (%d, %d)\n", ch, y, x);
+          x++;
+      }
+  }
   
   fclose(file);
   TileSet *tileset = _init_tileset();
