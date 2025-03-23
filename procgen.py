@@ -76,7 +76,7 @@ def printDungeon(d_map, wall=None, path=None):
     m = generator.texture_map(s)
     with open("map.txt","w") as file:
         file.write(m)
-    
+
 def createImage(d_map, color=None, chunky=None, fn=None):
 	color = False if color == None else bool(color)
 	chunky = False if chunky == None else bool(chunky)
@@ -138,9 +138,9 @@ def main(x=None, y=None, seed=None, d_lmt=None, a_lmt=None, reps=None, out=None,
 
 def parseArgs(args):
 	flags = {
-		"--height" : 20,
-		"--width"  : 20,
-		"--seed"   : 45,
+		"--height" : 40,
+		"--width"  : 40,
+		"--seed"   : 35,
 		"--death"  : 4,
 		"--birth"  : 4,
 		"--reps"   : 2,

@@ -114,5 +114,53 @@ def texture_map(map_data):
                 new_row.append(determine_texture(bordered_map, y, x))
         textured_map.append(''.join(new_row))
     
+    # Find all floor (empty space) positions
+    floor_positions = []
+    for y in range(1, len(textured_map)-1):
+        for x in range(1, len(textured_map[y])-1):
+            # Look for floor spaces (represented by ' ')
+            if textured_map[y][x] == ' ':
+                floor_positions.append((y, x))
+    
+    # Add 4 random zeros in well-spaced floor positions
+    import random
+    if len(floor_positions) >= 4:
+        # Function to get distance between two positions
+        def distance(pos1, pos2):
+            return ((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)**0.5
+        
+        # Try to find well-spaced positions
+        selected_positions = []
+        max_attempts = 100
+        min_distance = 8  # Minimum distance between zeros
+        
+        while len(selected_positions) < 4 and max_attempts > 0:
+            candidate = random.choice(floor_positions)
+            
+            # Check if candidate is far enough from all previously selected positions
+            is_far_enough = True
+            for pos in selected_positions:
+                if distance(candidate, pos) < min_distance:
+                    is_far_enough = False
+                    break
+            
+            if is_far_enough:
+                selected_positions.append(candidate)
+                floor_positions.remove(candidate)
+            
+            max_attempts -= 1
+        
+        # If we couldn't find 4 well-spaced positions, just pick random ones
+        while len(selected_positions) < 4 and floor_positions:
+            pos = random.choice(floor_positions)
+            selected_positions.append(pos)
+            floor_positions.remove(pos)
+        
+        # Replace the characters at selected positions with '0'
+        for y, x in selected_positions:
+            row_list = list(textured_map[y])
+            row_list[x] = '0'
+            textured_map[y] = ''.join(row_list)
+    
     return '\n'.join(textured_map)
 
