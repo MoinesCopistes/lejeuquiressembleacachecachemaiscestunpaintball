@@ -66,13 +66,13 @@ Player* p_player_create(PlayerType type, unsigned int iD, float speed, Circle *h
 int p_player_update_orientation(Player *player, Position *cursor)
 {
     float normal = p_fast_inverse_sqrt(
-      (cursor->x - player->hitbox.pos.x) * (cursor->x - player->hitbox.pos.x) +
-      (cursor->y - player->hitbox.pos.y) * (cursor->y - player->hitbox.pos.y));
+      (cursor->x - player->hitbox.pos.x+ world.offset.x) * (cursor->x - player->hitbox.pos.x+ world.offset.x) +
+      (cursor->y - player->hitbox.pos.y+ world.offset.y) * (cursor->y - player->hitbox.pos.y+ world.offset.y));
     float new_orientation;
-    if(normal * (cursor->y - player->hitbox.pos.y) > 0)
-        new_orientation = acos(normal * (cursor->x - player->hitbox.pos.x)) * 57.2957; //radiants to degrees
+    if(normal * (cursor->y - player->hitbox.pos.y+ world.offset.y) > 0)
+        new_orientation = acos(normal * (cursor->x - player->hitbox.pos.x+ world.offset.x)) * 57.2957; //radiants to degrees
     else
-        new_orientation = 360.0 - (acos(normal * (cursor->x - player->hitbox.pos.x)) * 57.2957);
+        new_orientation = 360.0 - (acos(normal * (cursor->x - player->hitbox.pos.x+ world.offset.x)) * 57.2957);
     //printf("%f\n",epm->orientation)  ;  */
 
     if(new_orientation == player->orientation)
@@ -93,11 +93,11 @@ void p_player_send_event_player_move(Player *player)
 
 void p_player_move(Player *player, Position *cursor) { //peux pas modifier car je dois checker si le centre de ma hitbox n'est pas sur la souris
   float normal = p_fast_inverse_sqrt(
-      (cursor->x - player->hitbox.pos.x) * (cursor->x - player->hitbox.pos.x) +
-      (cursor->y - player->hitbox.pos.y) * (cursor->y - player->hitbox.pos.y));
+      (cursor->x - player->hitbox.pos.x + world.offset.x) * (cursor->x - player->hitbox.pos.x + world.offset.x) +
+      (cursor->y - player->hitbox.pos.y + world.offset.y) * (cursor->y - player->hitbox.pos.y + world.offset.y));
   if (normal < 0.3) {
-    player->hitbox.pos.x += player->speed * player->accel_coeff * dt * normal * (cursor->x - player->hitbox.pos.x);
-    player->hitbox.pos.y += player->speed * player->accel_coeff * dt * normal * (cursor->y - player->hitbox.pos.y);
+    player->hitbox.pos.x += player->speed * player->accel_coeff * dt * normal * (cursor->x - player->hitbox.pos.x + world.offset.x);
+    player->hitbox.pos.y += player->speed * player->accel_coeff * dt * normal * (cursor->y - player->hitbox.pos.y + world.offset.y);
     player->accel_coeff += 0.1;
     if (player->accel_coeff > 1.0)
       player->accel_coeff = 1.0;

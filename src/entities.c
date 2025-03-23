@@ -59,34 +59,42 @@ void p_paint_ball_update(Entity *entity)
     ball->dis_squared += (dx * dx) + (dy * dy);    
     if(isServer)
     {
-        if(ball->dis_squared > ball->max_dis_squared)
+        //max distance
+        bool splashed = ball->dis_squared > ball->max_dis_squared;      
+        
+        //players
+        if(!splashed)
+        {
+            for(unsigned int i = 0; i < 4; ++i)
+            {
+                if(i != ball->player_id && world.players[i] != NULL)
+                {
+                    if(p_circle_is_in_circle(&(ball->hitbox),&(world.players[i]->hitbox)))
+                    {
+                        splashed = true;
+                        break;
+                    }
+                }
+            }
+        }
+        //walls
+        if(!splashed)
+        {
+            int row = (int)(ball->hitbox.pos.y / tile_size);
+            int col = (int)(ball->hitbox.pos.x / tile_size);
+            if(map->tiles[row][col].id != ' ')
+            {
+                printf("%d %d %c\n",row,col,map->tiles[row][col].id);
+                splashed = true;
+            }
+        }
+
+        if(splashed)
         {
             ball->e.alive = 0;
             EventKillEntity *epm = (EventKillEntity *)new_event(sizeof(EventKillEntity), EVENT_KILL_ENTITY);
             epm->iD = ball->e.iD;
             broadcast_event((Event *)epm, -1);
-        }
-
-        //players
-        bool splashed = false;
-        for(unsigned int i = 0; i < 4; ++i)
-        {
-            if(i != ball->player_id)
-            {
-                if(p_circle_is_in_circle(&(ball->hitbox),&(world.players[i]->hitbox)))
-                {
-                    splashed = true;
-                    break;
-                }
-            }
-        }
-
-        //walls
-        if(!splashed)
-        {
-            int row = (int)(ball->hitbox.pos.x / tile_size);
-            int col = (int)(ball->hitbox.pos.y / tile_size);
-            //if(Tile[row][col])
         }
         
     }
@@ -183,7 +191,7 @@ void p_entity_tab_draw_paint_balls()
             if(EntityTab[i]->type == ENTITY_PAINT_BALL)
             {
                 Paint_ball *ball = (Paint_ball *) EntityTab[i];
-                DrawCircle((int)ball->hitbox.pos.x, (int)ball->hitbox.pos.y,ball->hitbox.radius, RED);
+                DrawCircle((int)ball->hitbox.pos.x - world.offset.x, (int)ball->hitbox.pos.y - world.offset.y,ball->hitbox.radius, RED);
             }
         }
     }

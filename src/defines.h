@@ -70,3 +70,4 @@ typedef struct {
   Vector2 offset;
 } World;
 extern World world;
+extern Map *map;

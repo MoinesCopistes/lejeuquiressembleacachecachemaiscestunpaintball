@@ -22,6 +22,8 @@ enum game_states game_state = IN_MENU;
 char menuError[256] = {0};
 float dt;
 
+Map *map = NULL;
+
 int main(int argc, char **argv) {
 
   SetTraceLogLevel(LOG_NONE);
@@ -48,7 +50,7 @@ int main(int argc, char **argv) {
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
 
-  Map *map = p_load_map("map.txt");
+  map = p_load_map("map.txt");
 
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
@@ -115,11 +117,13 @@ int main(int argc, char **argv) {
     case IN_GAME:
 
       if (IsKeyDown(KEY_W)) {
-        p_player_move(world.players[world.playerID], &cursor_pos_with_offset);
+        p_player_move(world.players[world.playerID], &cursor);
       }
-      // trucs
-
-      // p_player_prey_move(players[1],&cursor,time);
+      else
+      {
+        if(p_player_update_orientation(world.players[world.playerID], &cursor))
+            p_player_send_event_player_move(world.players[world.playerID]);
+      }
 
       p_camera_follow();
       p_draw_map(map);
@@ -131,6 +135,17 @@ int main(int argc, char **argv) {
                      world.players[i]->hitbox.radius, DARKBLUE);
         }
       }
+
+      if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+      {
+          p_player_paint_ball_shoot(world.players[world.playerID]);
+      }
+
+      p_entity_tab_update();
+
+      p_entity_tab_draw_paint_balls();
+
+      p_entity_tab_dead_free();
       break;
     }
 
