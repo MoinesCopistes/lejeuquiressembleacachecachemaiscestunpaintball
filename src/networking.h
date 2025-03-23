@@ -1,4 +1,3 @@
-#include <bits/pthreadtypes.h>
 #include <chan.h>
 #include <defines.h>
 int p_start_server();
