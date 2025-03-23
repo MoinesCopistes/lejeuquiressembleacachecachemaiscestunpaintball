@@ -8,7 +8,7 @@
 #include <networking.h>
 #include <raylib.h>
 #include <stdio.h>
-
+#include "sound.h"
 /* GLOBAL VARIABLES */
 World world = {.players = {NULL, NULL, NULL, NULL},
                .entities = {NULL},
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
   Vector2 cursor = {0.0f, 0.0f};
 
   InitWindow(screenWidth, screenHeight, "paintball client");
-
+  InitAudioDevice();
   Button *menu_buttons = p_init_menu_buttons();
   Button *server_buttons = p_init_client_buttons();
   Input *server_inputs = p_init_client_inputs();
@@ -49,7 +49,8 @@ int main(int argc, char **argv) {
   //--------------------------------------------------------------------------------------
 
   Map *map = p_load_map("map.txt");
-
+  Sounds* sounds = p_init_sounds();
+  p_play_sound(sounds->sounds[0], (Vector2){0.0,0.0}, (Vector2){0.0,0.0});
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
@@ -137,7 +138,7 @@ int main(int argc, char **argv) {
     EndDrawing();
     //----------------------------------------------------------------------------------
   }
-
+  CloseAudioDevice();
   // De-Initialization
   //--------------------------------------------------------------------------------------
   CloseWindow(); // Close window and OpenGL context

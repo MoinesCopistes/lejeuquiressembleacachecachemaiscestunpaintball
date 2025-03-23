@@ -141,26 +141,23 @@ Map *p_load_map(const char *path) {
     } else {
       x++;
     }
-  }
-  fclose(file);
-  n_row = y;
-  log_info("Number of row parsed : %i", n_row);
-  log_info("Number of col parsed : %i", n_col);
-  char chars[n_row][n_col];
-  file = fopen(path, "r");
-  if (file == NULL) {
-    log_error("File not found when trying to load the map");
-  }
-  x = 0;
-  y = 0;
-  ch;
-  while ((ch = fgetc(file)) != EOF) {
-    if (ch == '\n') {
-      y++;
-      x = 0;
-    } else {
-      chars[y][x] = ch;
-      x++;
+    fclose(file);
+    n_row = y;
+    log_info("Number of row parsed : %i", n_row);
+    log_info("Number of col parsed : %i", n_col);
+    char chars[n_row][n_col];
+    file = fopen(path, "r");
+    if (file == NULL) {log_error("File not found when trying to load the map");}
+    x = 0;
+    y = 0;
+    while ((ch = fgetc(file)) != EOF) {
+        if (ch == '\n') {
+            y++;
+            x = 0;
+        } else {
+            chars[y][x] = ch;
+            x++;
+        }
     }
   }
   fclose(file);
