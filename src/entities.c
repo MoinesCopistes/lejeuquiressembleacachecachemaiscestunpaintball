@@ -66,6 +66,29 @@ void p_paint_ball_update(Entity *entity)
             epm->iD = ball->e.iD;
             broadcast_event((Event *)epm, -1);
         }
+
+        //players
+        bool splashed = false;
+        for(unsigned int i = 0; i < 4; ++i)
+        {
+            if(i != ball->player_id)
+            {
+                if(p_circle_is_in_circle(&(ball->hitbox),&(world.players[i]->hitbox))
+                {
+                    splashed = true;
+                    break;
+                }
+            }
+        }
+
+        //walls
+        if(!splashed)
+        {
+            int row = (int)(ball->hitbox.pos.x / tile_size);
+            int col = (int)(ball->hitbox.pos.y / tile_size);
+            //if(Tile[row][col])
+        }
+        
     }
     
     
