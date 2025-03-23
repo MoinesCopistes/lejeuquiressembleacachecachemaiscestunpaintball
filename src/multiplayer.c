@@ -88,8 +88,8 @@ void p_handle_event(Event *event, int clientID) {
 
   if (event->type == EVENT_PLAYER_MOVE) {
     EventPlayerMove *epm = (EventPlayerMove *)event;
-    world.players[epm->e.playerID]->hitbox.pos.x = epm->x;
-    world.players[epm->e.playerID]->hitbox.pos.y = epm->y;
+    world.players[epm->e.playerID]->objectiveX = epm->x;
+    world.players[epm->e.playerID]->objectiveY = epm->y;
     world.players[epm->e.playerID]->orientation = epm->orientation;
   }
 
@@ -141,6 +141,6 @@ void p_handle_event(Event *event, int clientID) {
     log_info("Player %d is the hunter\n", hunter);
     free((PlayerPrey*)world.players[hunter]);
     Circle c = {{0, 0}, 0};
-    world.players[hunter] = (Player*)p_player_hunter_create(hunter, 200, &c, 20, 20);
+    world.players[hunter] = (Player*)p_player_hunter_create(hunter, 500, &c, 20, 20);
   }
 }

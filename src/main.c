@@ -143,6 +143,7 @@ int main(int argc, char **argv) {
 
       p_camera_follow();
       p_draw_map(map);
+      p_update_players();
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
