@@ -17,7 +17,7 @@ void p_change_state_to_in_client() { game_state = IN_CLIENT; }
 void p_change_state_to_in_server() {
   p_start_server();
   init_multiplayer();
-  game_state = IN_LOBBY;
+  game_state = IN_GAME;
 }
 void p_try_to_connect() {
   p_start_client();
@@ -29,7 +29,7 @@ void p_try_to_connect() {
     return;
   }
   init_multiplayer();
-  game_state = IN_LOBBY;
+  game_state = IN_GAME;
 }
 
 Button *p_init_menu_buttons() {
