@@ -1,5 +1,6 @@
 #include "defines.h"
 #include "log.h"
+#include "map.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -67,7 +68,7 @@ Rectangle _init_tile_rect(char id) {
     return (Rectangle){0, 0, tile_size, tile_size}; // Default rectangle
   }
 }
-Tile _init_tile(char id, Coordinate pos) {
+Tile _init_tile(char id, Coordinate pos, Map *map) {
   if (id != '0') {
     Tile *tile = malloc(sizeof(Tile));
     tile->id = id;
@@ -76,9 +77,17 @@ Tile _init_tile(char id, Coordinate pos) {
     return *tile;
   } else {
     Tile *tile = malloc(sizeof(Tile));
-    tile->id = '5';
+    tile->id = ' ';
     tile->pos = pos;
-    tile->rect = _init_tile_rect('5');
+    tile->rect = _init_tile_rect(' ');
+    if (map->spawn_points == NULL) {
+      map->spawn_points = malloc(sizeof(Coordinate));
+    } else {
+      map->spawn_points = realloc(map->spawn_points, (map->spawn_points_n + 1) *
+                                                         sizeof(Coordinate));
+    }
+    map->spawn_points[map->spawn_points_n] = pos;
+    map->spawn_points_n++;
     return *tile;
   }
 }
@@ -99,7 +108,7 @@ TileSet *_init_tileset() {
 }
 
 Tile **_get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col],
-                      TileSet *tileset) {
+                      TileSet *tileset, Map *map) {
   Tile **tiles = (Tile **)malloc(sizeof(Tile *) * n_row);
   if (tiles == NULL) {
     log_error("Couldn't malloc Tile** in map.c");
@@ -112,7 +121,7 @@ Tile **_get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col],
   }
   for (int i = 0; i < n_row; i++) {
     for (int j = 0; j < n_col; j++) {
-      tiles[i][j] = _init_tile(grid[i][j], (Coordinate){j, i});
+      tiles[i][j] = _init_tile(grid[i][j], (Coordinate){j, i}, map);
     }
   }
   return tiles;
@@ -170,12 +179,15 @@ Map *p_load_map(const char *path) {
   }
 
   fclose(file);
-  TileSet *tileset = _init_tileset();
-  Tile **tiles = _get_tile_grid(n_col, n_row, chars, tileset);
   Map *map = malloc(sizeof(Map));
   if (map == NULL) {
     log_error("Cant malloc the map");
   }
+  map->spawn_points_n = 0;
+  map->spawn_points = NULL;
+
+  TileSet *tileset = _init_tileset();
+  Tile **tiles = _get_tile_grid(n_col, n_row, chars, tileset, map);
   map->tiles = tiles;
   map->cols = n_col;
   map->rows = n_row;
@@ -200,5 +212,6 @@ void p_free_map(Map *map) {
     UnloadTexture(map->tileset->texture);
     free(map->tileset);
   }
+  free(map->spawn_points);
   free(map);
 }

@@ -10,7 +10,6 @@
 #include <networking.h>
 #include <raylib.h>
 #include <stdio.h>
-#include "sound.h"
 
 /* GLOBAL VARIABLES */
 World world = {.players = {NULL, NULL, NULL, NULL},
@@ -52,10 +51,8 @@ int main(int argc, char **argv) {
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
 
-  Map *map = p_load_map("map.txt");
-  world.map = map;
+  world.map = p_load_map("map.txt");
   Sounds *sounds = p_init_sounds();
-
 
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
@@ -132,7 +129,7 @@ int main(int argc, char **argv) {
 
       if (IsKeyDown(KEY_W)) {
         p_player_move(world.players[world.playerID], &cursor_pos_with_offset,
-                      map);
+                      world.map);
       } else {
         if (p_player_update_orientation(world.players[world.playerID],
                                         (Position *)&cursor_pos_with_offset))
@@ -142,7 +139,7 @@ int main(int argc, char **argv) {
       p_player_update_tagged();
 
       p_camera_follow();
-      p_draw_map(map);
+      p_draw_map(world.map);
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
@@ -195,7 +192,7 @@ int main(int argc, char **argv) {
   // p_player_prey_free(world.players[0]);
   // p_player_prey_free(world.players[1]);
   //--------------------------------------------------------------------------------------
-  p_free_map(map);
+  p_free_map(world.map);
   p_free_sounds(sounds);
   return 0;
 }

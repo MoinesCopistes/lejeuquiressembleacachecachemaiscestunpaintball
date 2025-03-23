@@ -2,10 +2,12 @@
 #include "entities.h"
 #include "geo.h"
 #include "log.h"
+#include "map.h"
 #include <networking.h>
 #include <player.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /*
 You MUST call this function to create any events.
@@ -46,10 +48,32 @@ void init_multiplayer() {
   }
 
   printf("Creating %d players\n", world.playersNumber);
+  int *already_chosen = malloc(sizeof(int) * world.playersNumber);
   for (int i = 0; i <= world.playerID; i++) {
-    Circle c = {{200 + 100 * i, 200}, 30};
+    Circle c;
+    if (world.map->spawn_points_n > 0) {
+      int random_spawn_index = p_random_int(0, world.map->spawn_points_n - 1);
+      int times_already_chosen = 0;
+      for (int j = 0; j < i; i++) {
+        if (already_chosen[j] == random_spawn_index) {
+          times_already_chosen++;
+        }
+      }
+      already_chosen[i] = random_spawn_index;
+      Circle temp = {
+          {world.map->spawn_points[random_spawn_index].x * tile_size +
+               40 * times_already_chosen + 30,
+           world.map->spawn_points[random_spawn_index].y * tile_size + 30},
+          30};
+      c = temp;
+    } else {
+      printf("Map doesn't have a spawn point\n");
+      Circle temp = {{200 + 100 * i, 200}, 30};
+      c = temp;
+    }
     world.players[i] = (Player *)p_player_prey_create(i, 400, &c);
   }
+  free(already_chosen);
 }
 
 /*
