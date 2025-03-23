@@ -127,9 +127,9 @@ def main(x=None, y=None, seed=None, d_lmt=None, a_lmt=None, reps=None, out=None,
 
 def parseArgs(args):
 	flags = {
-		"--height" : 40,
-		"--width"  : 40,
-		"--seed"   : 35,
+		"--height" : 80,
+		"--width"  : 80,
+		"--seed"   : 40,
 		"--death"  : 4,
 		"--birth"  : 4,
 		"--reps"   : 2,
