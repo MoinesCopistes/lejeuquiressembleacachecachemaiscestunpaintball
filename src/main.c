@@ -127,9 +127,17 @@ int main(int argc, char **argv) {
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
-          DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
-                     world.players[i]->hitbox.pos.y - world.offset.y,
-                     world.players[i]->hitbox.radius, DARKBLUE);
+          Rectangle rect = {CAMERA_BOUNDARIES, CAMERA_BOUNDARIES,
+                            screen_x - 2 * CAMERA_BOUNDARIES,
+                            screen_y - 2 * CAMERA_BOUNDARIES
+
+          };
+          p_camera_follow();
+          p_draw_map(map);
+          DrawCircle(
+              world.players[world.playerID]->hitbox.pos.x - world.offset.x,
+              world.players[world.playerID]->hitbox.pos.y - world.offset.y,
+              world.players[i]->hitbox.radius, DARKBLUE);
         }
       }
       break;
