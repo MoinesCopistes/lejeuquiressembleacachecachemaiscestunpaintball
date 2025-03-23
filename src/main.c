@@ -84,6 +84,12 @@ int main(int argc, char **argv) {
   Texture2D yellow_ghost = LoadTexture("assets/yellow_ghost.png");
   Texture2D blue_ghost = LoadTexture("assets/blue_ghost.png");
   Texture2D ghosts[4] = {green_ghost, blue_ghost, yellow_ghost, red_ghost};
+  Texture2D red_ghost_dead = LoadTexture("assets/red_ghost_dead.png");
+  Texture2D green_ghost_dead= LoadTexture("assets/green_ghost_dead.png");
+  Texture2D yellow_ghost_dead = LoadTexture("assets/yellow_ghost_dead.png");
+  Texture2D blue_ghost_dead = LoadTexture("assets/blue_ghost_dead.png");
+  Texture2D ghosts_dead[4] = {green_ghost_dead, blue_ghost_dead, yellow_ghost_dead, red_ghost_dead};
+  Texture2D hunter_sprite = LoadTexture("assets/hunter.png");
   Texture2D background_hunter =
       LoadTexture("assets/background_hunter_winar.png");
   Texture2D background_prey = LoadTexture("assets/background_prey_winar.png");
@@ -212,18 +218,21 @@ int main(int argc, char **argv) {
         if (world.players[i] != NULL) {
 
           if (!world.players[i]->alive)
-            DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
-                       world.players[i]->hitbox.pos.y - world.offset.y,
-                       world.players[i]->hitbox.radius, GREEN);
-          else if (world.players[i]->tagged)
-            DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
-                       world.players[i]->hitbox.pos.y - world.offset.y,
-                       world.players[i]->hitbox.radius, YELLOW);
+            DrawTexture(ghosts_dead[i],
+                          world.players[i]->hitbox.pos.x - world.offset.x - 64,
+                          world.players[i]->hitbox.pos.y - world.offset.y - 64,
+                          WHITE);
+          else if (world.players[i]->tagged && world.players[world.playerID]->type == PLAYER_HUNTER)
+            DrawTexture(ghosts[i],
+                          world.players[i]->hitbox.pos.x - world.offset.x - 64,
+                          world.players[i]->hitbox.pos.y - world.offset.y - 64,
+                          WHITE);
           else {
             if (world.players[i]->type == PLAYER_HUNTER) {
-              DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
-                         world.players[i]->hitbox.pos.y - world.offset.y,
-                         world.players[i]->hitbox.radius, RED);
+              DrawTexture(hunter_sprite,
+                          world.players[i]->hitbox.pos.x - world.offset.x - 64,
+                          world.players[i]->hitbox.pos.y - world.offset.y - 64,
+                          WHITE);
             } else if (world.players[world.playerID]->type != PLAYER_HUNTER) {
 
               DrawTexture(ghosts[i],
