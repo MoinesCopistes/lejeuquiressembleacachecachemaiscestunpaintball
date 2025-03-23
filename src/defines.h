@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include "entities.h"
 
+
 #define player_radius 10
 #define player_color RED
 #define wall_size 20
@@ -29,12 +30,13 @@ typedef struct {
 } Coordinate;
 
 typedef struct {
-    Image* sprite;
+    char id;
     Coordinate pos;
+    Rectangle rect;
 } Tile;
 
 typedef struct {
-    Image* images;
+    Texture2D texture;
     const char* ids;
     int n_image;
 } TileSet;
@@ -43,6 +45,7 @@ typedef struct {
     Tile** tiles;
     int rows;
     int cols;
+    TileSet* tileset;
 } Map;
 
 enum game_states {

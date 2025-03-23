@@ -46,8 +46,8 @@ int main(int argc, char **argv) {
   int focused_server_input = 0;
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
-  Map *map = p_load_map("map.txt");
-  Texture2D text = p_assemble_atlas(map);
+  Map* map = p_load_map("map.txt");
+  
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
       DrawText("Waiting for others to join...", 300, 600, 50, WHITE);
       break;
     case IN_GAME:
-      DrawTexture(text, 0, 0, WHITE);
+      p_draw_map(map);
       if (IsKeyDown(KEY_W)) {
         p_player_move(world.players[world.playerID], &cursor_nul_de_tristan);
       }
@@ -139,6 +139,6 @@ int main(int argc, char **argv) {
   // p_player_prey_free(world.players[0]);
   // p_player_prey_free(world.players[1]);
   //--------------------------------------------------------------------------------------
-
+  p_free_map(map);
   return 0;
 }
