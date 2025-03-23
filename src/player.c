@@ -26,32 +26,25 @@ void p_player_move(Player *player, Position *cursor, Map *map) {
       (cursor->x - player->hitbox.pos.x) * (cursor->x - player->hitbox.pos.x) +
       (cursor->y - player->hitbox.pos.y) * (cursor->y - player->hitbox.pos.y));
   if (normal < 0.3) {
-    player->hitbox.pos.x += player->speed * player->accel_coeff * dt * normal *
-                            (cursor->x - player->hitbox.pos.x);
-    player->hitbox.pos.y += player->speed * player->accel_coeff * dt * normal *
-                            (cursor->y - player->hitbox.pos.y);
+    distance_added_x +=
+        player->speed * player->accel_coeff * dt * normal *
+        (cursor->x - player->hitbox.pos.x + player->hitbox.pos.x);
+    distance_added_y +=
+        player->speed * player->accel_coeff * dt * normal *
+        (cursor->y - player->hitbox.pos.y + player->hitbox.pos.y);
 
     int future_tile_index_x =
         (player->hitbox.pos.x + distance_added_x) / tile_size;
     int future_tile_index_y =
         (player->hitbox.pos.y + distance_added_y) / tile_size;
-    printf("future_tile_index_x = %d\n", future_tile_index_x);
-    printf("future_tile_index_y = %d\n", future_tile_index_y);
-    printf("player pos %f \n", player->hitbox.pos.x);
-    printf("tile_size %f\n", tile_size);
-    printf("distance added %f\n", distance_added_x);
-    printf("player->hitbox.pos.x + distance_added_x %f\n",
-           player->hitbox.pos.x + distance_added_x);
-    printf("/tile_size %f \n",
-           (player->hitbox.pos.x + distance_added_x) / (float)tile_size);
 
     char tile_type = map->tiles[future_tile_index_y][future_tile_index_x].id;
-    printf("typppppe %c\n", tile_type);
 
     if (tile_type == ' ') {
       player->hitbox.pos.x += distance_added_x;
       player->hitbox.pos.y += distance_added_y;
     }
+
     player->accel_coeff += 0.1;
     if (player->accel_coeff > 1.0)
       player->accel_coeff = 1.0;
