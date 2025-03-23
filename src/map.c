@@ -1,5 +1,6 @@
 #include "defines.h"
 #include "log.h"
+#include "map.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,10 +14,9 @@
 
 int p_random_int(int min, int max) { return min + rand() % (max - min + 1); }
 
-
 void _draw_tile(Tile tile, TileSet *tileset, Vector2 offset) {
-    float draw_x = tile.pos.x * tile_size - offset.x;
-    float draw_y = tile.pos.y * tile_size - offset.y;
+  float draw_x = tile.pos.x * tile_size - offset.x;
+  float draw_y = tile.pos.y * tile_size - offset.y;
 
     if (draw_x + tile_size > 0 && draw_x < screen_x &&
         draw_y + tile_size > 0 && draw_y < screen_y) {
@@ -84,11 +84,13 @@ Rectangle _init_tile_rect(char id) {
     return (Rectangle){0, 0, tile_size, tile_size}; // Default rectangle
   }
 }
-Tile _init_tile(char id, Coordinate pos) {
-  Tile *tile = malloc(sizeof(Tile));
-  tile->id = id;
-  tile->pos = pos;
-  if (strchr(blank_chars, (char) id) != NULL){
+
+Tile _init_tile(char id, Coordinate pos, Map *map) {
+  if (id != '0') {
+    Tile *tile = malloc(sizeof(Tile));
+    tile->id = id;
+    tile->pos = pos;
+   if (strchr(blank_chars, (char) id) != NULL){
     tile->over = _init_tile_rect(id);
     tile->rect = _init_tile_rect(' ');
   } else if (strchr(wall_chars, (char) id) != NULL) {
@@ -98,8 +100,22 @@ Tile _init_tile(char id, Coordinate pos) {
     tile->rect = _init_tile_rect(id);
     tile->over = (Rectangle){0,0,0,0};
   }
-
-  return *tile;
+    return *tile;
+  } else {
+    Tile *tile = malloc(sizeof(Tile));
+    tile->id = ' ';
+    tile->pos = pos;
+    tile->rect = _init_tile_rect(' ');
+    if (map->spawn_points == NULL) {
+      map->spawn_points = malloc(sizeof(Coordinate));
+    } else {
+      map->spawn_points = realloc(map->spawn_points, (map->spawn_points_n + 1) *
+                                                         sizeof(Coordinate));
+    }
+    map->spawn_points[map->spawn_points_n] = pos;
+    map->spawn_points_n++;
+    return *tile;
+  }
 }
 
 TileSet *_init_tileset() {
@@ -118,7 +134,7 @@ TileSet *_init_tileset() {
 }
 
 Tile **_get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col],
-                      TileSet *tileset) {
+                      TileSet *tileset, Map *map) {
   Tile **tiles = (Tile **)malloc(sizeof(Tile *) * n_row);
   if (tiles == NULL) {
     log_error("Couldn't malloc Tile** in map.c");
@@ -131,7 +147,7 @@ Tile **_get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col],
   }
   for (int i = 0; i < n_row; i++) {
     for (int j = 0; j < n_col; j++) {
-      tiles[i][j] = _init_tile(grid[i][j], (Coordinate){j, i});
+      tiles[i][j] = _init_tile(grid[i][j], (Coordinate){j, i}, map);
     }
   }
   return tiles;
@@ -139,8 +155,7 @@ Tile **_get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col],
 
 void p_draw_map(Map *map) {
   Vector2 offset = world.offset;
-  
-  
+
   for (int i = 0; i < map->rows; i++) {
     for (int j = 0; j < map->cols; j++) {
       Tile tile = map->tiles[i][j];
@@ -168,33 +183,38 @@ Map *p_load_map(const char *path) {
     } else {
       x++;
     }
-}
-    fclose(file);
-    n_row = y;
-    log_info("Number of row parsed : %i", n_row);
-    log_info("Number of col parsed : %i", n_col);
-    char chars[n_row][n_col];
-    file = fopen(path, "r");
-    if (file == NULL) {log_error("File not found when trying to load the map");}
-    x = 0;
-    y = 0;
-    while ((ch = fgetc(file)) != EOF) {
-        if (ch == '\n') {
-            y++;
-            x = 0;
-        } else {
-            chars[y][x] = ch;
-            x++;
-        }
-    }
-  
+  }
   fclose(file);
-  TileSet *tileset = _init_tileset();
-  Tile **tiles = _get_tile_grid(n_col, n_row, chars, tileset);
+  n_row = y;
+  log_info("Number of row parsed : %i", n_row);
+  log_info("Number of col parsed : %i", n_col);
+  char chars[n_row][n_col];
+  file = fopen(path, "r");
+  if (file == NULL) {
+    log_error("File not found when trying to load the map");
+  }
+  x = 0;
+  y = 0;
+  while ((ch = fgetc(file)) != EOF) {
+    if (ch == '\n') {
+      y++;
+      x = 0;
+    } else {
+      chars[y][x] = ch;
+      x++;
+    }
+  }
+
+  fclose(file);
   Map *map = malloc(sizeof(Map));
   if (map == NULL) {
     log_error("Cant malloc the map");
   }
+  map->spawn_points_n = 0;
+  map->spawn_points = NULL;
+
+  TileSet *tileset = _init_tileset();
+  Tile **tiles = _get_tile_grid(n_col, n_row, chars, tileset, map);
   map->tiles = tiles;
   map->cols = n_col;
   map->rows = n_row;
@@ -219,5 +239,6 @@ void p_free_map(Map *map) {
     UnloadTexture(map->tileset->texture);
     free(map->tileset);
   }
+  free(map->spawn_points);
   free(map);
 }

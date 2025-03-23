@@ -8,6 +8,7 @@ Entity* p_entity_create(EntityType type, unsigned int iD, unsigned long size)
     Entity *e = (Entity *) malloc(size);
     e->type = type;
     e->alive = 1;
+    e->iD = iD;
     return e;
 }
 

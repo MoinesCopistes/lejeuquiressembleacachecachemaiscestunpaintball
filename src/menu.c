@@ -239,11 +239,9 @@ Input *p_init_client_inputs() {
 }
 
 void p_draw_input(Input *input, bool focused) {
-  Color draw_color = {.r = 255, .g = 255, .b = 255, .a = 200};
-  if (!focused)
-    draw_color = WHITE;
+  Color draw_color = BLACK;
   DrawRectangleRec(input->display, draw_color);
-  Color text_color = BLACK;
+  Color text_color = WHITE;
   if (!focused)
     text_color = GRAY;
   DrawText(input->content, input->display.x + 15, input->display.y + 10, 25,
@@ -257,7 +255,7 @@ void p_draw_input(Input *input, bool focused) {
                           .y = input->display.y + 7,
                           .height = input->display.height - 10,
                           .width = 3};
-      DrawRectangleRec(cursor, DARKGRAY);
+      DrawRectangleRec(cursor, WHITE);
     }
   }
 }

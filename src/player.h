@@ -17,6 +17,8 @@ struct Player {
   int alive;
   int tagged;
   float timer;
+  float objectiveX;
+  float objectiveY;
 };
 
 Player *p_player_create(PlayerType type, unsigned int iD, float speed,
@@ -56,5 +58,6 @@ void p_camera_follow();
 void p_player_paint_ball_shoot(Player *player);
 void p_stab_calculate_broadcast(int iD);
 void p_player_stab(Player *player);
+void p_update_players();
 
 #endif
