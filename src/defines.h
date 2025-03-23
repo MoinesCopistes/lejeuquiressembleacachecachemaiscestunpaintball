@@ -21,29 +21,6 @@
 #define SCOPE(...)                                                             \
   for (int MACROVAR(_i_) = 0; !MACROVAR(_i_); ++MACROVAR(_i_), __VA_ARGS__)
 
-typedef struct {
-  int x, y;
-} Coordinate;
-
-typedef struct {
-  char id;
-  Coordinate pos;
-  Rectangle rect;
-} Tile;
-
-typedef struct {
-  Texture2D texture;
-  const char *ids;
-  int n_image;
-} TileSet;
-
-typedef struct {
-  Tile **tiles;
-  int rows;
-  int cols;
-  TileSet *tileset;
-} Map;
-
 enum game_states { IN_MENU, IN_CLIENT, IN_GAME, IN_LOBBY };
 
 extern const int screenWidth;

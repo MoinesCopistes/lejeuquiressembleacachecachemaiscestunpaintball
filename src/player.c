@@ -58,15 +58,31 @@ void p_camera_follow() {
   }
 }
 
-void p_player_move(Player *player, Position *cursor) {
+void p_player_move(Player *player, Position *cursor, Map *map) {
   float normal = p_fast_inverse_sqrt(
       (cursor->x - player->hitbox.pos.x) * (cursor->x - player->hitbox.pos.x) +
       (cursor->y - player->hitbox.pos.y) * (cursor->y - player->hitbox.pos.y));
   if (normal < 0.3) {
-    player->hitbox.pos.x += player->speed * player->accel_coeff * dt * normal *
-                            (cursor->x - player->hitbox.pos.x);
-    player->hitbox.pos.y += player->speed * player->accel_coeff * dt * normal *
-                            (cursor->y - player->hitbox.pos.y);
+    float added_dist_x;
+    float added_dist_y;
+
+    added_dist_x = player->speed * player->accel_coeff * dt * normal *
+                   (cursor->x - player->hitbox.pos.x);
+    added_dist_y = player->speed * player->accel_coeff * dt * normal *
+                   (cursor->y - player->hitbox.pos.y);
+
+    int next_tile_x_index_i = (player->hitbox.pos.x + added_dist_x) / tile_size;
+    int next_tile_x_index_j = player->hitbox.pos.y / tile_size;
+    int next_tile_y_index_i = player->hitbox.pos.x / tile_size;
+    int next_tile_y_index_j = (player->hitbox.pos.y + added_dist_y) / tile_size;
+
+    if (map->tiles[next_tile_x_index_j][next_tile_x_index_i].id == ' ') {
+      player->hitbox.pos.x += added_dist_x;
+    }
+    if (map->tiles[next_tile_y_index_j][next_tile_y_index_i].id == ' ') {
+      player->hitbox.pos.y += added_dist_y;
+    }
+
     player->accel_coeff += 0.1;
     if (player->accel_coeff > 1.0)
       player->accel_coeff = 1.0;
