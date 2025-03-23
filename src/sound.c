@@ -11,8 +11,6 @@ void p_play_sound(Sound sound, Vector2 sound_pos, Vector2 player_pos){
 
     float distance = sqrtf(relativePosition.x * relativePosition.x + relativePosition.y * relativePosition.y);
 
-    float distance = sqrtf(relativePosition.x * relativePosition.x + relativePosition.y * relativePosition.y);
-
     float angle = atan2f(relativePosition.y, relativePosition.x);
     angle = -angle * 180 / PI; // Adjust angle for 2D space
 
