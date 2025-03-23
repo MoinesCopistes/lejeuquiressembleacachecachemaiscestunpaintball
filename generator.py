@@ -85,7 +85,7 @@ def determine_texture(bordered, y, x):
     # Texture 4 (Left Edge)
     elif west == ' ' and east != ' ' and north != ' ' and south != ' ':
         return '6'
-    
+
     # Texture 6 (Right Edge)
     elif east == ' ' and west != ' ' and north != ' ' and south != ' ':
         return '4'
@@ -162,5 +162,17 @@ def texture_map(map_data):
             row_list[x] = '0'
             textured_map[y] = ''.join(row_list)
     
+    import random
+    if len(floor_positions) >= 8:  # Need enough space for all special characters
+        all_special_positions = []
+        
+        # Place 4 zeros
+        place_special_chars(floor_positions, '0', 4, 8, all_special_positions)
+        
+        # Place 2 'w' characters
+        place_special_chars(floor_positions, 'w', 10, 8, all_special_positions)
+        
+        # Place 2 'x' characters
+        place_special_chars(floor_positions, 'x', 10, 8, all_special_positions)
+    
     return '\n'.join(textured_map)
-
