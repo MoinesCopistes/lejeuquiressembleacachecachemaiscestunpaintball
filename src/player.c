@@ -4,7 +4,7 @@
 #include "raylib.h"
 #include <math.h>
 #include <stdio.h>
-
+#include <string.h>
 #define LERP_FACTOR 0.05f   // Adjust for desired smoothness
 #define LERP_THRESHOLD 0.5f // Rounding threshold to prevent flickering
 
@@ -114,12 +114,11 @@ void p_player_move(Player *player, Position *cursor, Map *map) {
     int next_tile_x_index_j = player->hitbox.pos.y / tile_size;
     int next_tile_y_index_i = player->hitbox.pos.x / tile_size;
     int next_tile_y_index_j = (player->hitbox.pos.y + added_dist_y) / tile_size;
-    char id_x = map->tiles[next_tile_x_index_j][next_tile_x_index_i].id;
-    char id_y = map->tiles[next_tile_y_index_j][next_tile_y_index_i].id;
-    if (id_x == ' ' || strchr(blank_chars, id_x) != NULL || strchr(wall_chars, id_x) != NULL) {
+
+    if (map->tiles[next_tile_x_index_j][next_tile_x_index_i].id == ' ') {
       player->hitbox.pos.x += added_dist_x;
     }
-    if (id_y == ' ' || strchr(blank_chars, id_y) != NULL || strchr(wall_chars, id_y) != NULL) {
+    if (map->tiles[next_tile_y_index_j][next_tile_y_index_i].id == ' ') {
       player->hitbox.pos.y += added_dist_y;
     }
 
