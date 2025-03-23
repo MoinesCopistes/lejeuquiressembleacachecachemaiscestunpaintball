@@ -15,6 +15,7 @@ add_executable(paintball ${SOURCES} ${CHANSOURCES})
 
 # Include raylib headers
 target_include_directories(paintball PRIVATE vendor/raylib/include)
+target_include_directories(paintball PRIVATE vendor/raylib/src/external)
 target_include_directories(paintball PRIVATE vendor/chan/)
 target_include_directories(paintball PRIVATE src)
 
