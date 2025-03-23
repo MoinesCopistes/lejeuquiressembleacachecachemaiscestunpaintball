@@ -112,6 +112,7 @@ int main(int argc, char **argv) {
       DrawText("Waiting for others to join...", 300, 600, 50, WHITE);
       break;
     case IN_GAME:
+
       if (IsKeyDown(KEY_W)) {
         p_player_move(world.players[world.playerID], &cursor_nul_de_tristan);
       }
@@ -127,7 +128,6 @@ int main(int argc, char **argv) {
           DrawCircle(screenWidth / 2,
                      screenHeight / 2, world.players[i]->hitbox.radius,
                      DARKBLUE);
-
 
         }
       }
