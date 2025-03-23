@@ -120,8 +120,7 @@ Tile _init_tile(char id, Coordinate pos, Map *map) {
 
 TileSet *_init_tileset() {
   const char *ids = " 123456789azqs";
-  const char *path = "2D Pixel Dungeon Asset Pack v2.0/2D Pixel Dungeon Asset "
-                     "Pack/character and tileset/Dungeon_Tileset.png";
+  const char *path = "Dungeon_Tileset.png";
   int n_image = strlen(ids);
   TileSet *tileset = malloc(sizeof(TileSet));
   tileset->ids = ids;
