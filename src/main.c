@@ -13,7 +13,8 @@
 World world = {.players = {NULL, NULL, NULL, NULL},
                .entities = {NULL},
                .playerID = 0,
-               .playersNumber = 1};
+               .playersNumber = 1,
+               .offset = {0, 0}};
 
 const int screenWidth = screen_x;
 const int screenHeight = screen_y;
@@ -53,7 +54,7 @@ int main(int argc, char **argv) {
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
     cursor = GetMousePosition();
-    Position cursor_nul_de_tristan = p_cast_vector_to_position(cursor);
+    Position cursor_pos_with_offset = cursor_with_offset(cursor);
 
     BeginDrawing();
 
@@ -105,16 +106,16 @@ int main(int argc, char **argv) {
       break;
     case IN_LOBBY:
       for (int i = 0; i < world.playersNumber; i++) {
-        DrawCircle(250 + 250*i, 450, 50, BLUE);
-        char t[2] = {48+i, 0};
-        DrawText(t, 240+250*i, 510, 25, WHITE);
+        DrawCircle(250 + 250 * i, 450, 50, BLUE);
+        char t[2] = {48 + i, 0};
+        DrawText(t, 240 + 250 * i, 510, 25, WHITE);
       }
       DrawText("Waiting for others to join...", 300, 600, 50, WHITE);
       break;
     case IN_GAME:
 
       if (IsKeyDown(KEY_W)) {
-        p_player_move(world.players[world.playerID], &cursor_nul_de_tristan);
+        p_player_move(world.players[world.playerID], &cursor_pos_with_offset);
       }
       // trucs
 
@@ -123,14 +124,17 @@ int main(int argc, char **argv) {
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
+          Rectangle rect = {CAMERA_BOUNDARIES, CAMERA_BOUNDARIES,
+                            screen_x - 2 * CAMERA_BOUNDARIES,
+                            screen_y - 2 * CAMERA_BOUNDARIES
 
-
-          p_draw_map(map, (Vector2){(int)world.players[i]->hitbox.pos.x, (int)world.players[i]->hitbox.pos.y});
-          DrawCircle(screenWidth / 2,
-                     screenHeight / 2, world.players[i]->hitbox.radius,
-                     DARKBLUE);
-
-
+          };
+          p_camera_follow();
+          p_draw_map(map);
+          DrawCircle(
+              world.players[world.playerID]->hitbox.pos.x - world.offset.x,
+              world.players[world.playerID]->hitbox.pos.y - world.offset.y,
+              world.players[i]->hitbox.radius, DARKBLUE);
         }
       }
       break;

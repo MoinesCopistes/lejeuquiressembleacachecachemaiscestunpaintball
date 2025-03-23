@@ -41,6 +41,7 @@ struct PlayerPrey
 
 PlayerPrey* p_player_prey_create(unsigned int iD, float speed, Circle *hitbox);
 void p_player_prey_free(PlayerPrey *player);
+void p_camera_follow();
 
 
 

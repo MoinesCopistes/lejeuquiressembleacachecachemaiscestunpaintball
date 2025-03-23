@@ -16,7 +16,7 @@
 #define screen_x map_size_x * tile_size
 #define screen_y map_size_y * tile_size
 #define MAX_CLIENT_NUMBER 4
-
+#define CAMERA_BOUNDARIES 400
 
 
 #define MACROVAR(name)      CONCAT(name, __LINE__)
@@ -67,5 +67,6 @@ typedef struct {
   int playersNumber;
   char* serverAddress;
   char* serverPort;
+  Vector2 offset;
 } World;
 extern World world;
