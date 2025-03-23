@@ -25,7 +25,7 @@ char menuError[256] = {0};
 float dt;
 
 int main(int argc, char **argv) {
-
+  printf("%fl %fl\n", screen_x, screen_y);
   SetTraceLogLevel(LOG_NONE);
   // if (argc == 1) {
   //   printf("Starting a server...\n");
@@ -53,10 +53,21 @@ int main(int argc, char **argv) {
 
   world.map = p_load_map("map.txt");
   Sounds *sounds = p_init_sounds();
+  Texture2D background = LoadTexture("assets/background.png");
+  Music music_calm = LoadMusicStream("assets/sound/music_calm.mp3");
+  Music music_pursuit = LoadMusicStream("assets/sound/music_pursuit.mp3");
+  Music *mu = &music_calm;
+  enum music_states music_state = MUSIC_CALM;
+  PlayMusicStream(*mu);
 
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
+
+    //printf("%p\n",mu);
+    UpdateMusicStream(*mu);
+
+
     cursor = GetMousePosition();
     Position cursor_pos_with_offset = cursor_with_offset(cursor);
 
@@ -68,18 +79,20 @@ int main(int argc, char **argv) {
 
     switch (game_state) {
     case IN_MENU:
+      DrawTexture(background, 0, 0, WHITE);
       for (int i = 0; i < NUMBER_OF_MENU_BUTTONS; i++) {
         Button *button_ptr = &menu_buttons[i];
         p_button_check_inputs(cursor, button_ptr);
-        p_draw_button(button_ptr, WHITE, RED);
+        p_draw_button(button_ptr, WHITE, BLUE);
       }
       break;
     case IN_CLIENT:
+      DrawTexture(background, 0, 0, WHITE);
       DrawText(menuError, 440, 200, 25, RED);
       for (int i = 0; i < NUMBER_OF_SERVER_BUTTONS; i++) {
         Button *button_ptr = &server_buttons[i];
         p_button_check_inputs(cursor, button_ptr);
-        p_draw_button(button_ptr, WHITE, RED);
+        p_draw_button(button_ptr, WHITE, BLUE);
       }
       if (IsKeyPressed(KEY_TAB)) {
         focused_server_input =
@@ -109,17 +122,18 @@ int main(int argc, char **argv) {
 
       break;
     case IN_LOBBY:
+      DrawTexture(background, 0, 0, WHITE);
       for (int i = 0; i < world.playersNumber; i++) {
-        DrawCircle(250 + 250 * i, 450, 50, BLUE);
+        DrawCircle(250 + 250 * i, 450, 50, PURPLE);
         char t[2] = {48 + i, 0};
-        DrawText(t, 240 + 250 * i, 510, 25, WHITE);
+        DrawText(t, 240 + 250 * i, 510, 25, BLACK);
       }
-      DrawText("Waiting for others to join...", 300, 600, 50, WHITE);
+      DrawText("Waiting for others to join...", 300, 600, 50, BLACK);
       if (isServer) {
         for (int i = 0; i < NUMBER_OF_LOBBY_BUTTONS; i++) {
           Button *button_ptr = &lobby_buttons[i];
           p_button_check_inputs(cursor, button_ptr);
-          p_draw_button(button_ptr, WHITE, RED);
+          p_draw_button(button_ptr, WHITE, BLUE);
         }
 
         DrawText(menuError, 440, 200, 25, RED);
@@ -140,9 +154,11 @@ int main(int argc, char **argv) {
 
       p_camera_follow();
       p_draw_map(world.map);
+      p_update_players();
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
+
           if (!world.players[i]->alive)
             DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
                        world.players[i]->hitbox.pos.y - world.offset.y,
@@ -163,6 +179,40 @@ int main(int argc, char **argv) {
             }
           }
         }
+      }
+
+      enum music_states music_state2 = MUSIC_CALM; //rofl
+
+      if (world.players[world.playerID]->type == PLAYER_HUNTER)
+      {
+        for (int i = 0; i < 4; i++){
+            if(world.players[i] != NULL)
+            {
+                printf("%d\n", world.players[i]->alive);
+                if(world.players[i]->alive && world.players[i]->tagged)
+                {
+                    music_state2 = MUSIC_PURSUIT;
+                }
+            }
+        }
+      }
+      else
+      {
+        if(world.players[world.playerID]->alive && world.players[world.playerID]->tagged)
+            music_state2 = MUSIC_PURSUIT;
+      }
+
+
+      //printf("%d %d\n",music_state,music_state2);
+      if(music_state != music_state2)
+      {
+         StopMusicStream(*mu);
+         music_state = music_state2;
+         if(music_state == MUSIC_CALM)
+            mu = &music_calm;
+         else
+            mu = &music_pursuit;
+         PlayMusicStream(*mu);
       }
 
       if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {

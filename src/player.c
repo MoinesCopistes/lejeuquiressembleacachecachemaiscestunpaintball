@@ -1,11 +1,14 @@
 #include "player.h"
 #include "defines.h"
 #include "networking.h"
+#include "raylib.h"
 #include <math.h>
 #include <stdio.h>
 
 #define LERP_FACTOR 0.05f   // Adjust for desired smoothness
 #define LERP_THRESHOLD 0.5f // Rounding threshold to prevent flickering
+
+double last_event_time = 0;
 
 void p_camera_follow() {
   Vector2 *offset = &world.offset;
@@ -67,14 +70,11 @@ int p_player_update_orientation(Player *player, Position *cursor) {
       (cursor->y - player->hitbox.pos.y) * (cursor->y - player->hitbox.pos.y));
   float new_orientation;
   if (normal * (cursor->y - player->hitbox.pos.y) > 0)
-    new_orientation =
-        acos(normal * (cursor->x - player->hitbox.pos.x)) *
-        57.2957; // radiants to degrees
+    new_orientation = acos(normal * (cursor->x - player->hitbox.pos.x)) *
+                      57.2957; // radiants to degrees
   else
     new_orientation =
-        360.0 -
-        (acos(normal * (cursor->x - player->hitbox.pos.x)) *
-         57.2957);
+        360.0 - (acos(normal * (cursor->x - player->hitbox.pos.x)) * 57.2957);
   // printf("%f\n",epm->orientation)  ;  */
 
   if (new_orientation == player->orientation)
@@ -84,12 +84,17 @@ int p_player_update_orientation(Player *player, Position *cursor) {
 }
 
 void p_player_send_event_player_move(Player *player) {
-  EventPlayerMove *epm =
-      (EventPlayerMove *)new_event(sizeof(EventPlayerMove), EVENT_PLAYER_MOVE);
-  epm->x = player->hitbox.pos.x;
-  epm->y = player->hitbox.pos.y;
-  epm->orientation = player->orientation;
-  broadcast_event((Event *)epm, -1);
+  double current_time = GetTime();
+  double dt = current_time - last_event_time;
+  if (dt >= 0.1) {
+    last_event_time = current_time;
+    EventPlayerMove *epm = (EventPlayerMove *)new_event(sizeof(EventPlayerMove),
+                                                        EVENT_PLAYER_MOVE);
+    epm->x = player->hitbox.pos.x;
+    epm->y = player->hitbox.pos.y;
+    epm->orientation = player->orientation;
+    broadcast_event((Event *)epm, -1);
+  }
 }
 
 void p_player_move(Player *player, Position *cursor, Map *map) {
@@ -126,24 +131,34 @@ void p_player_move(Player *player, Position *cursor, Map *map) {
   }
 }
 
-void p_player_update_tagged()
-{
-    for(unsigned int i = 0; i < 4; ++i)
-    {
-        if(world.players[i] != NULL)
-        {
-            if(world.players[i]->tagged == 1)
-            {
-                world.players[i]->timer += dt;
-                if(world.players[i]->timer >= 10.0)
-                {
-                    world.players[i]->tagged = 0;
-                    world.players[i]->timer = 0.0;
-                }
-            }
+void p_player_update_tagged() {
+  for (unsigned int i = 0; i < 4; ++i) {
+    if (world.players[i] != NULL) {
+      if (world.players[i]->tagged == 1) {
+        world.players[i]->timer += dt;
+        if (world.players[i]->timer >= 10.0) {
+          world.players[i]->tagged = 0;
+          world.players[i]->timer = 0.0;
         }
+      }
     }
- 
+  }
+}
+
+
+void p_update_players() {
+  for (int i = 0; i < world.playersNumber; i++) {
+    if (i == world.playerID) continue;
+    Player* p = world.players[i];
+    p->hitbox.pos.y += (p->objectiveY - p->hitbox.pos.y) * 0.20;
+    if (fabs(p->hitbox.pos.y - p->objectiveY) < 0.5) {
+      p->hitbox.pos.y = p->objectiveY;
+    }
+    p->hitbox.pos.x += (p->objectiveX - p->hitbox.pos.x) * 0.20;
+    if (fabs(p->hitbox.pos.x - p->objectiveX) < 0.5) {
+      p->hitbox.pos.x = p->objectiveX;
+    }
+  }
 }
 
 void p_paint_regen(PlayerHunter *hunter) {
