@@ -47,8 +47,10 @@ typedef struct {
 
 enum game_states {
   IN_MENU,
-  IN_SETTINGS,
+  IN_SERVER,
+  IN_CLIENT,
   IN_GAME,
+  IN_LOBBY
 };
 
 extern const int screenWidth;
