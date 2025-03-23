@@ -116,7 +116,8 @@ int main(int argc, char **argv) {
     case IN_GAME:
 
       if (IsKeyDown(KEY_W)) {
-        p_player_move(world.players[world.playerID], &cursor_pos_with_offset);
+        p_player_move(world.players[world.playerID], &cursor_pos_with_offset,
+                      map);
       }
       // trucs
 
