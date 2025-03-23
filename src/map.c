@@ -18,12 +18,16 @@ void _draw_tile(Tile tile, TileSet *tileset, Vector2 offset) {
   float draw_x = tile.pos.x * tile_size - offset.x;
   float draw_y = tile.pos.y * tile_size - offset.y;
 
-  if (draw_x + tile_size > 0 && draw_x < screen_x && draw_y + tile_size > 0 &&
-      draw_y < screen_y) {
-    DrawTexturePro(tileset->texture, tile.rect,
-                   (Rectangle){draw_x, draw_y, tile_size, tile_size},
-                   (Vector2){0, 0}, 0, WHITE);
-  }
+    if (draw_x + tile_size > 0 && draw_x < screen_x &&
+        draw_y + tile_size > 0 && draw_y < screen_y) {
+        DrawTexturePro(tileset->texture, tile.rect,
+                       (Rectangle){draw_x, draw_y, tile_size, tile_size},
+                       (Vector2){0, 0}, 0, WHITE);
+        if (tile.over.height != 0){
+          DrawTexturePro(tileset->texture, tile.over, (Rectangle){draw_x, draw_y, tile_size, tile_size},
+          (Vector2){0, 0}, 0, WHITE);
+        }
+    }
 }
 
 Rectangle _init_tile_rect(char id) {
@@ -63,17 +67,39 @@ Rectangle _init_tile_rect(char id) {
     return (Rectangle){3 * 16, 5 * 16, texture_size, texture_size};
   case 's':
     return (Rectangle){0, 5 * 16, texture_size, texture_size};
+  case 'e':
+    return (Rectangle){0, 9 * 16, texture_size, texture_size};
+  case 'd':
+    return (Rectangle){4 * 16, 6 * 16, texture_size, texture_size};
+  case 'f':
+    return (Rectangle){5 * 16, 6 * 16, texture_size, texture_size};
+  case 'r':
+    return (Rectangle){16, 9*16, texture_size, texture_size};
+  case 'w':
+    return (Rectangle){8 * 16, 6*16, texture_size, texture_size};
+  case 'x':
+    return (Rectangle){7 * 16, 7*16, texture_size, texture_size};
   default:
     log_error("Unknown tile character: %c", id);
     return (Rectangle){0, 0, tile_size, tile_size}; // Default rectangle
   }
 }
+
 Tile _init_tile(char id, Coordinate pos, Map *map) {
   if (id != '0') {
     Tile *tile = malloc(sizeof(Tile));
     tile->id = id;
     tile->pos = pos;
+   if (strchr(blank_chars, (char) id) != NULL){
+    tile->over = _init_tile_rect(id);
+    tile->rect = _init_tile_rect(' ');
+  } else if (strchr(wall_chars, (char) id) != NULL) {
+    tile->over = _init_tile_rect(id);
+    tile->rect = _init_tile_rect('2');
+  } else {
     tile->rect = _init_tile_rect(id);
+    tile->over = (Rectangle){0,0,0,0};
+  }
     return *tile;
   } else {
     Tile *tile = malloc(sizeof(Tile));
@@ -139,6 +165,7 @@ void p_draw_map(Map *map) {
 }
 
 Map *p_load_map(const char *path) {
+  //int result = system("python3 generator.py");
   FILE *file = fopen(path, "r");
   if (file == NULL) {
     log_error("File not found when trying to load the map");

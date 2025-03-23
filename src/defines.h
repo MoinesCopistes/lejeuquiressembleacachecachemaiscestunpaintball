@@ -14,6 +14,8 @@
 #define map_size_y 12
 #define screen_x (map_size_x * tile_size)
 #define screen_y (map_size_y * tile_size)
+#define blank_chars "xwrdf"
+#define wall_chars "e"
 #define MAX_CLIENT_NUMBER 4
 #define CAMERA_BOUNDARIES 400
 
