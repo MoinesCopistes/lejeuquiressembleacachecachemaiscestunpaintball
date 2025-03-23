@@ -109,11 +109,12 @@ void p_player_move(Player *player, Position *cursor, Map *map) {
     int next_tile_x_index_j = player->hitbox.pos.y / tile_size;
     int next_tile_y_index_i = player->hitbox.pos.x / tile_size;
     int next_tile_y_index_j = (player->hitbox.pos.y + added_dist_y) / tile_size;
-
-    if (map->tiles[next_tile_x_index_j][next_tile_x_index_i].id == ' ') {
+    char id_x = map->tiles[next_tile_x_index_j][next_tile_x_index_i].id;
+    char id_y = map->tiles[next_tile_y_index_j][next_tile_y_index_i].id;
+    if (id_x == ' ' || strchr(blank_chars, id_x) != NULL || strchr(wall_chars, id_x) != NULL) {
       player->hitbox.pos.x += added_dist_x;
     }
-    if (map->tiles[next_tile_y_index_j][next_tile_y_index_i].id == ' ') {
+    if (id_y == ' ' || strchr(blank_chars, id_y) != NULL || strchr(wall_chars, id_y) != NULL) {
       player->hitbox.pos.y += added_dist_y;
     }
 

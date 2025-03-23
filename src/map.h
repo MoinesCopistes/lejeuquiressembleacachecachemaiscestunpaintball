@@ -9,6 +9,7 @@ typedef struct {
   char id;
   Coordinate pos;
   Rectangle rect;
+  Rectangle over;
 } Tile;
 
 typedef struct {
