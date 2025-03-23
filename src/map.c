@@ -13,17 +13,16 @@
 
 int p_random_int(int min, int max) { return min + rand() % (max - min + 1); }
 
-
 void _draw_tile(Tile tile, TileSet *tileset, Vector2 offset) {
-    float draw_x = tile.pos.x * tile_size - offset.x;
-    float draw_y = tile.pos.y * tile_size - offset.y;
+  float draw_x = tile.pos.x * tile_size - offset.x;
+  float draw_y = tile.pos.y * tile_size - offset.y;
 
-    if (draw_x + tile_size > 0 && draw_x < screen_x &&
-        draw_y + tile_size > 0 && draw_y < screen_y) {
-        DrawTexturePro(tileset->texture, tile.rect,
-                       (Rectangle){draw_x, draw_y, tile_size, tile_size},
-                       (Vector2){0, 0}, 0, WHITE);
-    }
+  if (draw_x + tile_size > 0 && draw_x < screen_x && draw_y + tile_size > 0 &&
+      draw_y < screen_y) {
+    DrawTexturePro(tileset->texture, tile.rect,
+                   (Rectangle){draw_x, draw_y, tile_size, tile_size},
+                   (Vector2){0, 0}, 0, WHITE);
+  }
 }
 
 Rectangle _init_tile_rect(char id) {
@@ -69,11 +68,19 @@ Rectangle _init_tile_rect(char id) {
   }
 }
 Tile _init_tile(char id, Coordinate pos) {
-  Tile *tile = malloc(sizeof(Tile));
-  tile->id = id;
-  tile->pos = pos;
-  tile->rect = _init_tile_rect(id);
-  return *tile;
+  if (id != '0') {
+    Tile *tile = malloc(sizeof(Tile));
+    tile->id = id;
+    tile->pos = pos;
+    tile->rect = _init_tile_rect(id);
+    return *tile;
+  } else {
+    Tile *tile = malloc(sizeof(Tile));
+    tile->id = '5';
+    tile->pos = pos;
+    tile->rect = _init_tile_rect('5');
+    return *tile;
+  }
 }
 
 TileSet *_init_tileset() {
@@ -113,8 +120,7 @@ Tile **_get_tile_grid(int n_col, int n_row, const char grid[n_row][n_col],
 
 void p_draw_map(Map *map) {
   Vector2 offset = world.offset;
-  
-  
+
   for (int i = 0; i < map->rows; i++) {
     for (int j = 0; j < map->cols; j++) {
       Tile tile = map->tiles[i][j];
@@ -141,26 +147,28 @@ Map *p_load_map(const char *path) {
     } else {
       x++;
     }
-}
-    fclose(file);
-    n_row = y;
-    log_info("Number of row parsed : %i", n_row);
-    log_info("Number of col parsed : %i", n_col);
-    char chars[n_row][n_col];
-    file = fopen(path, "r");
-    if (file == NULL) {log_error("File not found when trying to load the map");}
-    x = 0;
-    y = 0;
-    while ((ch = fgetc(file)) != EOF) {
-        if (ch == '\n') {
-            y++;
-            x = 0;
-        } else {
-            chars[y][x] = ch;
-            x++;
-        }
+  }
+  fclose(file);
+  n_row = y;
+  log_info("Number of row parsed : %i", n_row);
+  log_info("Number of col parsed : %i", n_col);
+  char chars[n_row][n_col];
+  file = fopen(path, "r");
+  if (file == NULL) {
+    log_error("File not found when trying to load the map");
+  }
+  x = 0;
+  y = 0;
+  while ((ch = fgetc(file)) != EOF) {
+    if (ch == '\n') {
+      y++;
+      x = 0;
+    } else {
+      chars[y][x] = ch;
+      x++;
     }
-  
+  }
+
   fclose(file);
   TileSet *tileset = _init_tileset();
   Tile **tiles = _get_tile_grid(n_col, n_row, chars, tileset);
