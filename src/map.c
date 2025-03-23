@@ -11,7 +11,7 @@ int p_random_int(int min, int max) {
 }
 
 void _draw_tile(Tile tile, TileSet* tileset){
-    DrawTexturePro(tileset->texture, tile.rect, (Rectangle){tile.pos.x * tile_size, tile.pos.y * tile_size, tile_size, tile_size}, (Vector2){0,0}, rot, WHITE);
+    DrawTexturePro(tileset->texture, tile.rect, (Rectangle){tile.pos.x * tile_size, tile.pos.y * tile_size, tile_size, tile_size}, (Vector2){0,0}, 0, WHITE);
 }
 
 Rectangle _init_tile_rect(char id) {
