@@ -26,7 +26,7 @@ char menuError[256] = {0};
 float dt;
 
 int main(int argc, char **argv) {
-
+  printf("%fl %fl\n", screen_x, screen_y);
   SetTraceLogLevel(LOG_NONE);
   // if (argc == 1) {
   //   printf("Starting a server...\n");
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
   Map *map = p_load_map("map.txt");
   world.map = map;
   Sounds *sounds = p_init_sounds();
-
+  Texture2D background = LoadTexture("assets/background.png");
 
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
@@ -71,18 +71,20 @@ int main(int argc, char **argv) {
 
     switch (game_state) {
     case IN_MENU:
+      DrawTexture(background, 0, 0, WHITE);
       for (int i = 0; i < NUMBER_OF_MENU_BUTTONS; i++) {
         Button *button_ptr = &menu_buttons[i];
         p_button_check_inputs(cursor, button_ptr);
-        p_draw_button(button_ptr, WHITE, RED);
+        p_draw_button(button_ptr, WHITE, BLUE);
       }
       break;
     case IN_CLIENT:
+      DrawTexture(background, 0, 0, WHITE);
       DrawText(menuError, 440, 200, 25, RED);
       for (int i = 0; i < NUMBER_OF_SERVER_BUTTONS; i++) {
         Button *button_ptr = &server_buttons[i];
         p_button_check_inputs(cursor, button_ptr);
-        p_draw_button(button_ptr, WHITE, RED);
+        p_draw_button(button_ptr, WHITE, BLUE);
       }
       if (IsKeyPressed(KEY_TAB)) {
         focused_server_input =
@@ -112,17 +114,18 @@ int main(int argc, char **argv) {
 
       break;
     case IN_LOBBY:
+      DrawTexture(background, 0, 0, WHITE);
       for (int i = 0; i < world.playersNumber; i++) {
-        DrawCircle(250 + 250 * i, 450, 50, BLUE);
+        DrawCircle(250 + 250 * i, 450, 50, PURPLE);
         char t[2] = {48 + i, 0};
-        DrawText(t, 240 + 250 * i, 510, 25, WHITE);
+        DrawText(t, 240 + 250 * i, 510, 25, BLACK);
       }
-      DrawText("Waiting for others to join...", 300, 600, 50, WHITE);
+      DrawText("Waiting for others to join...", 300, 600, 50, BLACK);
       if (isServer) {
         for (int i = 0; i < NUMBER_OF_LOBBY_BUTTONS; i++) {
           Button *button_ptr = &lobby_buttons[i];
           p_button_check_inputs(cursor, button_ptr);
-          p_draw_button(button_ptr, WHITE, RED);
+          p_draw_button(button_ptr, WHITE, BLUE);
         }
 
         DrawText(menuError, 440, 200, 25, RED);
