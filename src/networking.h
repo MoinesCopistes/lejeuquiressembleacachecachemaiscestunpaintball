@@ -25,8 +25,6 @@ enum EventType {
   EVENT_KILL_ENTITY, 
 
   EVENT_STAB,
-  
-  EVENT_KILL_PLAYER,
 
   EVENT_KILL_PLAYER,
 
