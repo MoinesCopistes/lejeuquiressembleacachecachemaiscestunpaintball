@@ -10,13 +10,13 @@
 
 double last_event_time = 0;
 
-void p_camera_follow() {
+void p_camera_follow(int iD) {
   Vector2 *offset = &world.offset;
   Rectangle rect = {
       offset->x + CAMERA_BOUNDARIES, offset->y + CAMERA_BOUNDARIES,
       screen_x - 2 * CAMERA_BOUNDARIES, screen_y - 2 * CAMERA_BOUNDARIES};
 
-  Player *p = world.players[world.playerID];
+  Player *p = world.players[iD];
 
   float target_x = offset->x;
   float target_y = offset->y;

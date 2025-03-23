@@ -21,7 +21,7 @@
 #define SCOPE(...)                                                             \
   for (int MACROVAR(_i_) = 0; !MACROVAR(_i_); ++MACROVAR(_i_), __VA_ARGS__)
 
-enum game_states { IN_MENU, IN_CLIENT, IN_GAME, IN_LOBBY };
+enum game_states { IN_MENU, IN_CLIENT, IN_GAME, IN_LOBBY, IN_HUNTER_WON, IN_PREY_WON };
 
 enum music_states { MUSIC_CALM, MUSIC_PURSUIT};
 
@@ -39,6 +39,7 @@ typedef struct {
   char *serverPort;
   Vector2 offset;
   Map* map;
+  float timer;
 } World;
 extern World world;
 extern Map *map;
