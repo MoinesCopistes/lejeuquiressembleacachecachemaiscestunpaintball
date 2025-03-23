@@ -23,6 +23,8 @@
 
 enum game_states { IN_MENU, IN_CLIENT, IN_GAME, IN_LOBBY };
 
+enum music_states { MUSIC_CALM, MUSIC_PURSUIT};
+
 extern const int screenWidth;
 extern const int screenHeight;
 extern enum game_states game_state;
