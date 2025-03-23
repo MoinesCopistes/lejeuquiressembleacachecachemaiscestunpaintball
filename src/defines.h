@@ -9,23 +9,18 @@
 #define wall_color DARKGRAY
 #define texture_size 16
 #define texture_scale 4.0
-#define tile_size texture_scale *texture_size
+#define tile_size (texture_scale * texture_size)
 #define map_size_x 20
 #define map_size_y 12
-#define screen_x map_size_x *tile_size
-#define screen_y map_size_y *tile_size
+#define screen_x (map_size_x * tile_size)
+#define screen_y (map_size_y * tile_size)
 #define MAX_CLIENT_NUMBER 4
 
 #define MACROVAR(name) CONCAT(name, __LINE__)
 #define SCOPE(...)                                                             \
   for (int MACROVAR(_i_) = 0; !MACROVAR(_i_); ++MACROVAR(_i_), __VA_ARGS__)
 
-enum game_states {
-  IN_MENU,
-  IN_CLIENT,
-  IN_GAME,
-  IN_LOBBY
-};
+enum game_states { IN_MENU, IN_CLIENT, IN_GAME, IN_LOBBY };
 
 extern const int screenWidth;
 extern const int screenHeight;
@@ -38,7 +33,7 @@ typedef struct {
   int playerID;
   int playersNumber;
   Vector2 player_spawn_point;
-  char* serverAddress;
-  char* serverPort;
+  char *serverAddress;
+  char *serverPort;
 } World;
 extern World world;
