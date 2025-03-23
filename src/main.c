@@ -195,6 +195,18 @@ int main(int argc, char **argv) {
           }
         }
       }
+      // SOUND PART OF CODE
+      for (int i = 0; i < world.playersNumber; i++) {
+        if (i == world.playerID) {
+          continue;
+        }
+        Vector2 other_player_vector = {world.players[i]->hitbox.pos.x,
+                                       world.players[i]->hitbox.pos.y};
+
+        Vector2 player_vector = {world.players[world.playerID]->hitbox.pos.x,
+                                 world.players[world.playerID]->hitbox.pos.y};
+        p_play_sound(sounds->sounds[0], other_player_vector, player_vector);
+      }
 
       enum music_states music_state2 = MUSIC_CALM; // rofl
 

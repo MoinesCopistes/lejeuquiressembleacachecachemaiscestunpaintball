@@ -1,57 +1,47 @@
-#include "sound.h"
 #include "raylib.h"
 #include "raymath.h"
+#include "sound.h"
 #include <unistd.h>
 
+void p_play_sound(Sound sound, Vector2 sound_pos, Vector2 player_pos) {
 
+  Vector2 relativePosition = {sound_pos.x - player_pos.x,
+                              sound_pos.y - player_pos.y};
 
+  float distance = sqrtf(relativePosition.x * relativePosition.x +
+                         relativePosition.y * relativePosition.y);
 
-void p_play_sound(Sound sound, Vector2 sound_pos, Vector2 player_pos){
+  float angle = atan2f(relativePosition.y, relativePosition.x);
+  angle = -angle * 180 / PI; // Adjust angle for 2D space
 
-    Vector2 relativePosition = {sound_pos.x - player_pos.x, sound_pos.y - player_pos.y};
+  // Map angle to pan
+  float pan = fabsf(angle) / 180.0f; // Map angle to pan
 
+  // Adjust volume based on distance
+  float volume = 50.0f / distance; // Scale distance for louder volume
+  volume *= 1.0f; // Increase overall volume (adjust this value as needed)
 
-    float distance = sqrtf(relativePosition.x * relativePosition.x + relativePosition.y * relativePosition.y);
+  // Clamp volume to a maximum of 1.0
+  if (volume > 1.0f) {
+    volume = 1.0f;
+  }
 
-    float angle = atan2f(relativePosition.y, relativePosition.x);
-    angle = -angle * 180 / PI; // Adjust angle for 2D space
+  float pitch = 1.0f;
+  if (angle < -35 && angle > -145) {
+    volume *= 0.5f; // Reduce volume
+    pitch = 0.9f;   // Lower pitch
+  }
 
+  SetSoundPan(sound, pan);
 
-    // Map angle to pan
-    float pan = fabsf(angle) / 180.0f; // Map angle to pan
+  SetSoundVolume(sound, volume);
+  SetSoundPitch(sound, pitch);
 
-    // Adjust volume based on distance
-    float volume = 50.0f / distance; // Scale distance for louder volume
-    volume *= 1.0f; // Increase overall volume (adjust this value as needed)
-
-    // Clamp volume to a maximum of 1.0
-    if (volume > 1.0f) {
-        volume = 1.0f;
-    }
-
-    float pitch = 1.0f;
-    if (angle < -35 && angle > -145) {
-        volume *= 0.5f; // Reduce volume
-        pitch = 0.9f;  // Lower pitch
-    }
-
-    SetSoundPan(sound, pan);
-
-    SetSoundVolume(sound, volume);
-    SetSoundPitch(sound, pitch);
-
-    PlaySound(sound);
-    
-
-
+  PlaySound(sound);
 }
 
-
-
-
-
 Sounds *p_init_sounds() {
-  const char *sounds_path[] = {"resources/pilou.wav"};
+  const char *sounds_path[] = {"resources/walking_sound.wav"};
   int num_sounds = sizeof(sounds_path);
   Sounds *sounds = (Sounds *)malloc(sizeof(Sounds));
   Sound *sound = (Sound *)malloc(sizeof(Sound) * num_sounds);
