@@ -54,7 +54,6 @@ int main(int argc, char **argv) {
   //--------------------------------------------------------------------------------------
 
   world.map = p_load_map("map.txt");
-  printf("toto %d\n", world.map->spawn_points_n);
   Sounds *sounds = p_init_sounds();
   Texture2D paint_ball_texture = LoadTexture("assets/paint_ball.png");
   Texture2D background = LoadTexture("assets/background.png");

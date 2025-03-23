@@ -165,6 +165,7 @@ void p_draw_map(Map *map) {
 }
 
 Map *p_load_map(const char *path) {
+  printf("%s\n", path);
   //int result = system("python3 generator.py");
   FILE *file = fopen(path, "r");
   if (file == NULL) {
