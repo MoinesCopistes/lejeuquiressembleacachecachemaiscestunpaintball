@@ -47,19 +47,22 @@ typedef struct {
 
 enum game_states {
   IN_MENU,
-  IN_SETTINGS,
+  IN_CLIENT,
   IN_GAME,
+  IN_LOBBY
 };
 
 extern const int screenWidth;
 extern const int screenHeight;
 extern enum game_states game_state;
-
+extern char menuError[256];
 extern float dt;
 typedef struct {
   Player* players[4];
   Entity* entities[512];
   int playerID;
   int playersNumber;
+  char* serverAddress;
+  char* serverPort;
 } World;
 extern World world;

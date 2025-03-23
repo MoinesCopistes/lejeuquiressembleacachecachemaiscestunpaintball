@@ -1,13 +1,38 @@
-#include "defines.h"
 #include "menu.h"
+#include "defines.h"
+#include "networking.h"
 #include <raylib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-void p_change_state_to_in_game() { game_state = IN_GAME; }
+void p_change_state_to_in_game() {
+  p_start_server();
+  init_multiplayer();
+  game_state = IN_GAME;
 
-Button *p_init_buttons() {
+}
+void p_change_state_to_in_menu() { game_state = IN_MENU; }
+void p_change_state_to_in_client() { game_state = IN_CLIENT; }
+void p_change_state_to_in_server() {
+  p_start_server();
+  init_multiplayer();
+  game_state = IN_LOBBY;
+}
+void p_try_to_connect() {
+  p_start_client();
+  while (!isConnected) {
+  };
+  if (isConnected == -1) {
+    sprintf(menuError, "Could not connect to %s:%s", world.serverAddress, world.serverPort);
+    isConnected = 0;
+    return;
+  }
+  init_multiplayer();
+  game_state = IN_LOBBY;
+}
+
+Button *p_init_menu_buttons() {
   Button *buttons = malloc(sizeof(Button) * NUMBER_OF_MENU_BUTTONS);
   Texture2D button_background_texture =
       LoadTexture("resources/button_background.png"); // Load button texture
@@ -32,7 +57,7 @@ Button *p_init_buttons() {
       button_background_frame_height,
       0,
       4,
-      "Start",
+      "Explore solo",
       p_change_state_to_in_game,
   };
 
@@ -45,17 +70,17 @@ Button *p_init_buttons() {
           button_background_frame_height * 1.7f,
       (float)button_background_texture.width, button_background_frame_height};
 
-  Button settings_button = {
+  Button server_button = {
       button_background_texture,
       button_background_source_rectangle,
       settings_button_bounds,
       button_background_frame_height,
       0,
       4,
-      "Settings",
-      p_change_state_to_in_game,
+      "Join a server",
+      p_change_state_to_in_client,
   };
-  buttons[1] = settings_button;
+  buttons[1] = server_button;
 
   // Define button bounds on screen
   Rectangle IP_button_bounds = {
@@ -64,18 +89,126 @@ Button *p_init_buttons() {
           button_background_frame_height * 3.4f,
       (float)button_background_texture.width, button_background_frame_height};
 
-  Button IP_button = {
+  Button client_button = {
       button_background_texture,
       button_background_source_rectangle,
       IP_button_bounds,
       button_background_frame_height,
       0,
       4,
-      "Look for IP",
-      p_change_state_to_in_game,
+      "Host a server",
+      p_change_state_to_in_server,
   };
-  buttons[2] = IP_button;
+  buttons[2] = client_button;
   return buttons;
+}
+
+Button *p_init_client_buttons() {
+  Button *buttons = malloc(sizeof(Button) * NUMBER_OF_SERVER_BUTTONS);
+  Texture2D button_background_texture =
+      LoadTexture("resources/button_background.png"); // Load button texture
+
+  // Define frame rectangle for drawing
+  float button_background_frame_height =
+      (float)button_background_texture.height / 3;
+  Rectangle button_background_source_rectangle = {
+      0, 0, (float)button_background_texture.width,
+      button_background_frame_height};
+
+  // Define button bounds on screen
+  Rectangle start_button_bounds = {
+      screenWidth / 2.0f - button_background_source_rectangle.width / 2.0f,
+      screenHeight / 2.0f - button_background_frame_height / 2.0f +
+          button_background_frame_height * 1.7 * 2,
+
+      (float)button_background_texture.width, button_background_frame_height};
+
+  Button start_button = {
+      button_background_texture,
+      button_background_source_rectangle,
+      start_button_bounds,
+      button_background_frame_height,
+      0,
+      4,
+      "Connect to the server !",
+      p_try_to_connect,
+  };
+
+  buttons[0] = start_button;
+  // Define button bounds on screen
+  Rectangle back_button_bounds = {
+      screenWidth / 2.0f - button_background_source_rectangle.width / 2.0f,
+      screenHeight / 2.0f - button_background_frame_height / 2.0f +
+          button_background_frame_height * 1.7 * 3,
+      (float)button_background_texture.width, button_background_frame_height};
+
+  Button back_button = {
+      button_background_texture,
+      button_background_source_rectangle,
+      back_button_bounds,
+      button_background_frame_height,
+      0,
+      4,
+      "Back to the menu",
+      p_change_state_to_in_menu,
+  };
+
+  buttons[1] = back_button;
+  return buttons;
+}
+
+Input *p_init_client_inputs() {
+  Input *inputs = malloc(sizeof(Input) * NUMBER_OF_SERVER_INPUTS);
+  Rectangle rect = {
+      .height = 40,
+      .width = 300,
+      .x = 490,
+      .y = 300,
+  };
+  Input ip_input = {.content = {'1', '2', '7', '.', '0', '.', '0', '.', '1', 0,
+                                0, 0, 0, 0, 0},
+                    .cursor_pos = 8,
+                    .display = rect};
+
+  Rectangle rect2 = {
+      .height = 40,
+      .width = 300,
+      .x = 490,
+      .y = 400,
+  };
+  Input port_input = {
+      .content = {'8', '0', '8', '0', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      .cursor_pos = 3,
+      .display = rect2};
+  inputs[1] = port_input;
+  inputs[0] = ip_input;
+  world.serverAddress = inputs[0].content;
+  world.serverPort = inputs[1].content;
+  return inputs;
+}
+
+void p_draw_input(Input *input, bool focused) {
+  Color draw_color = {.r = 255, .g = 255, .b = 255, .a = 200};
+  if (!focused)
+    draw_color = WHITE;
+  DrawRectangleRec(input->display, draw_color);
+  Color text_color = BLACK;
+  if (!focused)
+    text_color = GRAY;
+  DrawText(input->content, input->display.x + 15, input->display.y + 10, 25,
+           text_color);
+  if (focused) {
+    if ((int)GetTime() % 2 >= 1) {
+
+      int textWidht = MeasureText(input->content, 25);
+
+      Rectangle cursor = {.x = input->display.x + textWidht + 20,
+                          .y = input->display.y + 7,
+                          .height = input->display.height - 10,
+                          .width = 3};
+      DrawRectangleRec(cursor, DARKGRAY);
+    }
+  }
 }
 
 void p_draw_button(Button *button, Color tint, Color text_color) {
@@ -123,7 +256,7 @@ void p_draw_button(Button *button, Color tint, Color text_color) {
   }
 }
 
-void p_menu_check_inputs(Vector2 mouse_pos, Button *button) {
+void p_button_check_inputs(Vector2 mouse_pos, Button *button) {
   // Check button state
   if (CheckCollisionPointRec(mouse_pos, button->button_bounds)) {
 
