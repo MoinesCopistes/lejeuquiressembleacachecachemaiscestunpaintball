@@ -1,28 +1,25 @@
 #include "defines.h"
 #include "geo.h"
+#include "map.h"
 #include "menu.h"
 #include "world.h"
 #include <log.h>
 #include <networking.h>
 #include <raylib.h>
 #include <stdio.h>
-#include "map.h"
-
 
 /* GLOBAL VARIABLES */
-World world = {
-  .players = {NULL, NULL, NULL, NULL},
-  .entities = {NULL},
-  .playerID = 0,
-  .playersNumber = 1
-};
+World world = {.players = {NULL, NULL, NULL, NULL},
+               .entities = {NULL},
+               .playerID = 0,
+               .playersNumber = 1,
+               .player_spawn_point = {0, 0}};
 
 const int screenWidth = screen_x;
 const int screenHeight = screen_y;
 enum game_states game_state = IN_MENU;
 
 float dt;
-
 
 int main(int argc, char **argv) {
 
@@ -40,6 +37,7 @@ int main(int argc, char **argv) {
   init_multiplayer();
 
   Vector2 cursor = {0.0f, 0.0f};
+  printf("screenWidth %d\n", screenWidth);
 
   InitWindow(screenWidth, screenHeight, "paintball client");
 
@@ -47,8 +45,8 @@ int main(int argc, char **argv) {
 
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
-  Map* map = p_load_map("map.txt");
-  
+  Map *map = p_load_map("map.txt");
+
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
@@ -75,7 +73,8 @@ int main(int argc, char **argv) {
     case IN_GAME:
       p_draw_map(map);
       if (IsKeyDown(KEY_W)) {
-        p_player_move(world.players[world.playerID], &cursor_nul_de_tristan);
+        p_player_move(world.players[world.playerID], &cursor_nul_de_tristan,
+                      map);
       }
       // trucs
 
@@ -84,8 +83,8 @@ int main(int argc, char **argv) {
       for (int i = 0; i < 4; i++) {
         if (world.players[i] != NULL) {
           DrawCircle((int)world.players[i]->hitbox.pos.x,
-                     (int)world.players[i]->hitbox.pos.y, world.players[i]->hitbox.radius,
-                     DARKBLUE);
+                     (int)world.players[i]->hitbox.pos.y,
+                     world.players[i]->hitbox.radius, DARKBLUE);
         }
       }
       break;

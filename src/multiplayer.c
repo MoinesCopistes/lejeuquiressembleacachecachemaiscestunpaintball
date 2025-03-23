@@ -1,5 +1,6 @@
 #include "defines.h"
 #include "log.h"
+#include "map.h"
 #include <networking.h>
 #include <player.h>
 #include <stdio.h>
@@ -24,7 +25,6 @@ Event *new_event(unsigned long size, enum EventType type) {
   return e;
 }
 
-
 /*
 This function will send HELLO event to the server
 and wait for the server to respond with a player id for our new client.
@@ -43,8 +43,9 @@ void init_multiplayer() {
   }
 
   for (int i = 0; i <= world.playerID; i++) {
-    Circle c = {{200 + 100 * i, 200}, 30};
-    world.players[i] = (Player*) p_player_prey_create(i, 300, &c);
+    Circle c = {
+        {world.player_spawn_point.x + 100 * i, world.player_spawn_point.y}, 30};
+    world.players[i] = (Player *)p_player_prey_create(i, 300, &c);
     printf("world.players[%d] = %p\n", i, world.players[i]);
   }
 }
@@ -73,7 +74,8 @@ void p_handle_event(Event *event, int clientID) {
     printf("Adding the %d player\n", newClientId);
     world.playersNumber++;
     Circle c = {{200 + 100 * newClientId, 200}, 30};
-    world.players[newClientId] = (Player*)p_player_prey_create(newClientId, 300, &c);
+    world.players[newClientId] =
+        (Player *)p_player_prey_create(newClientId, 300, &c);
   }
 
   if (event->type == EVENT_ASSIGN_ID) {
@@ -83,9 +85,8 @@ void p_handle_event(Event *event, int clientID) {
   }
 
   if (event->type == EVENT_PLAYER_MOVE) {
-    EventPlayerMove* epm = (EventPlayerMove*) event;
+    EventPlayerMove *epm = (EventPlayerMove *)event;
     world.players[epm->e.playerID]->hitbox.pos.x = epm->x;
     world.players[epm->e.playerID]->hitbox.pos.y = epm->y;
   }
 }
-
