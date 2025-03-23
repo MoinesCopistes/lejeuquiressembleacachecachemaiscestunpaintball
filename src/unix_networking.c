@@ -228,12 +228,14 @@ void *client_main(void *data) {
   bzero(&servaddr, sizeof(servaddr));
 
   servaddr.sin_family = AF_INET;
-  servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-  servaddr.sin_port = htons(8080);
+  printf("Trying to connect %s on port %s\n", world.serverAddress, world.serverPort);
+  servaddr.sin_addr.s_addr = inet_addr(world.serverAddress);
+  servaddr.sin_port = htons(atoi(world.serverPort));
 
   if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) != 0) {
     log_error("connection with the server failed...\n");
-    exit(0);
+    isConnected = -1;
+    return NULL;
   } else
     log_info("connected to the server..\n");
 

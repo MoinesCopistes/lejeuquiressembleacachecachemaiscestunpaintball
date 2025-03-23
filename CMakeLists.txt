@@ -3,7 +3,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(paintball)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -ggdb")
-
+set(CMAKE_C_STANDARD 11)  
 # Add raylib
 option(BUILD_EXAMPLES "Build examples" OFF)
 add_subdirectory(vendor/raylib)

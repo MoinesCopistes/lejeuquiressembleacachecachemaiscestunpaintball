@@ -45,7 +45,6 @@ void init_multiplayer() {
   for (int i = 0; i <= world.playerID; i++) {
     Circle c = {{200 + 100 * i, 200}, 30};
     world.players[i] = (Player*) p_player_prey_create(i, 300, &c);
-    printf("world.players[%d] = %p\n", i, world.players[i]);
   }
 }
 
@@ -70,7 +69,7 @@ void p_handle_event(Event *event, int clientID) {
 
   if (event->type == EVENT_HELLO) {
     int newClientId = world.playersNumber;
-    printf("Adding the %d player\n", newClientId);
+    log_info("Adding the player %d\n", newClientId);
     world.playersNumber++;
     Circle c = {{200 + 100 * newClientId, 200}, 30};
     world.players[newClientId] = (Player*)p_player_prey_create(newClientId, 300, &c);
