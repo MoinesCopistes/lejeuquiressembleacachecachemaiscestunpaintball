@@ -9,6 +9,9 @@
 void p_change_state_to_in_game() {
   p_start_server();
   init_multiplayer();
+  EventStart *es = (EventStart *)new_event(sizeof(EventStart), EVENT_START);
+  p_handle_event(es, -1);
+
   game_state = IN_GAME;
 }
 void p_change_state_to_in_menu() { game_state = IN_MENU; }
