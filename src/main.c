@@ -61,15 +61,30 @@ int main(int argc, char **argv) {
     if (IsKeyDown(KEY_W)) {
       p_player_move(world.players[world.playerID], &cursor);
     }
-    // p_player_prey_move(players[1],&cursor,time);
+    else
+    {
+        if(p_player_update_orientation(world.players[world.playerID], &cursor))
+            p_player_send_event_player_move(world.players[world.playerID]);
+    }
 
     for (int i = 0; i < 4; i++) {
       if (world.players[i] != NULL) {
         DrawCircle((int)world.players[i]->hitbox.pos.x, (int)world.players[i]->hitbox.pos.y,
                    world.players[i]->hitbox.radius, DARKBLUE);
       }
-
     }
+
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        p_player_paint_ball_shoot(world.players[world.playerID]);
+    }
+    printf("%u\n",p_entity_tab_size());
+    
+    p_entity_tab_update();
+
+    p_entity_tab_draw_paint_balls();
+
+    p_entity_tab_dead_free();
 
     EndDrawing();
     //----------------------------------------------------------------------------------

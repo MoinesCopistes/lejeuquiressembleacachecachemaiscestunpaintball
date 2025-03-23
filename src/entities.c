@@ -1,7 +1,8 @@
 #include "entities.h"
 #include "defines.h"
+#include "networking.h"
 
-Entity* p_entity_create(EntityType type, unsigned long size)
+Entity* p_entity_create(EntityType type, unsigned int iD, unsigned long size)
 {
     Entity *e = (Entity *) malloc(size);
     e->type = type;
@@ -19,11 +20,13 @@ void (*EntityFreeFunctions[ENTITY_NUMBER])(Entity *entity) = {
 
 //Different entities
 
-Paint_ball* p_paint_ball_create(Position *start, Position *cursor, unsigned int iD, unsigned int player_id, float speed_coeff, float radius, float splash_radius, float max_dis_squared)
-{
-    Paint_ball *ball = (Paint_ball *) p_entity_create(ENTITY_PAINT_BALL,sizeof(Paint_ball));
+unsigned int balls_shot = 0;
 
-    ball->iD = iD;
+Paint_ball* p_paint_ball_create(Position *start, float orientation, unsigned int player_id, float speed_coeff, float radius, float splash_radius, float max_dis_squared)
+{
+
+    Paint_ball *ball = (Paint_ball *) p_entity_create(ENTITY_PAINT_BALL, balls_shot,sizeof(Paint_ball));
+    balls_shot++;
     ball->player_id = player_id;
     
     ball->hitbox.pos.x = start->x;
@@ -34,10 +37,8 @@ Paint_ball* p_paint_ball_create(Position *start, Position *cursor, unsigned int 
     ball->dis_squared = 0.0;
     ball->max_dis_squared = max_dis_squared;
 
-    float normal = p_fast_inverse_sqrt((cursor->x - start->x) * (cursor->x - start->x) + (cursor->y - start->y) * (cursor->y - start->y));
-
-    ball->speed_x = SPEED_PAINT_BALL * speed_coeff * normal * (cursor->x - start->x);
-    ball->speed_y = SPEED_PAINT_BALL * speed_coeff * normal * (cursor->y - start->y);
+    ball->speed_x = SPEED_PAINT_BALL * speed_coeff * cos(orientation / 57.2957);
+    ball->speed_y = SPEED_PAINT_BALL * speed_coeff * sin(orientation / 57.2957);
 
     return ball;
 }
@@ -56,7 +57,18 @@ void p_paint_ball_update(Entity *entity)
     ball->hitbox.pos.x += dx;
     ball->hitbox.pos.y += dy;
     ball->dis_squared += (dx * dx) + (dy * dy);    
-    ball->e.alive = ball->dis_squared < ball->max_dis_squared;
+    if(isServer)
+    {
+        if(ball->dis_squared > ball->max_dis_squared)
+        {
+            ball->e.alive = 0;
+            EventKillEntity *epm = (EventKillEntity *)new_event(sizeof(EventKillEntity), EVENT_KILL_ENTITY);
+            epm->iD = ball->e.iD;
+            broadcast_event((Event *)epm, -1);
+        }
+    }
+    
+    
 }
 
 //Entity tab
@@ -74,7 +86,10 @@ void p_entity_all_tab_free()
     for(unsigned int i = 0; i < OBJECT_LIMIT; ++i)
     {
         if(EntityTab[i] != NULL)
+        {
             EntityFreeFunctions[EntityTab[i]->type](EntityTab[i]);
+            EntityTab[i] = NULL;
+        }
     }
 }
 
@@ -97,6 +112,17 @@ int p_entity_tab_is_full()
     return 1;
 }
 
+unsigned int p_entity_tab_size() //renvoie combien d'éléments sont dans le tableau
+{
+    unsigned int counter = 0;
+    for(unsigned int i = 0; i < OBJECT_LIMIT; ++i)
+    {
+        if(EntityTab[i] != NULL)
+            counter++;
+    }
+    return counter; 
+}
+
 int p_entity_tab_add(Entity* entity)
 {
     for(unsigned int i = 0; i < OBJECT_LIMIT; ++i)
@@ -117,7 +143,25 @@ void p_entity_tab_dead_free()
         if(EntityTab[i] != NULL)
         {
             if(EntityTab[i]->alive == 0)
+            {
                 EntityFreeFunctions[EntityTab[i]->type](EntityTab[i]);
+                EntityTab[i] = NULL;
+            }
+        }
+    }
+}
+
+void p_entity_tab_draw_paint_balls()
+{
+    for(unsigned int i = 0; i < OBJECT_LIMIT; ++i)
+    {
+        if(EntityTab[i] != NULL)
+        {
+            if(EntityTab[i]->type == ENTITY_PAINT_BALL)
+            {
+                Paint_ball *ball = (Paint_ball *) EntityTab[i];
+                DrawCircle((int)ball->hitbox.pos.x, (int)ball->hitbox.pos.y,ball->hitbox.radius, RED);
+            }
         }
     }
 }
