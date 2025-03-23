@@ -31,3 +31,10 @@ Simply create a `build` directory. Then,
 Then go back to project root and launch the game with
 
 `make -C build/ && ./build/paintball`
+
+## How to generate a dungeon
+
+The dungeons are generated using procgen.py simply use
+```python
+python3 procgen.py
+```

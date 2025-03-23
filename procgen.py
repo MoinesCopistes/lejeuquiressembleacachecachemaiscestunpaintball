@@ -31,20 +31,14 @@ def refineDungeon(d_map, d_lmt=None, a_lmt=None):
 			x, y = i, j
 			n_count = countAliveNeighbors(d_map, x, y)
 			if d_map[y][x]:
-				# It's a wall.
 				if n_count < d_lmt:
-					# It has too few wall neighbors, so kill it.
 					new_line.append(False)
 				else:
-					# It has enough wall neighbors, so keep it.
 					new_line.append(True)
 			else:
-				# It's a path.
 				if n_count > a_lmt:
-					# It has too many wall neighbors, so it becomes a wall.
 					new_line.append(True)
 				else:
-					# It's not too crowded, so it stays a path.
 					new_line.append(False)
 		new_map.append(new_line)
 	return new_map
@@ -57,12 +51,9 @@ def countAliveNeighbors(d_map, x, y):
 			if i == 0 and j == 0:
 				continue
 			if n_x < 0 or n_x >= len(d_map[j]) or n_y == 0 or n_y >= len(d_map):
-				# The target cell is at the edge of the map and this neighbor is off the edge.
-				# So we make this neighbor count as a wall.
 				count += 1
 				#pass
 			elif d_map[n_y][n_x]:
-				# This neighbor is on the map and is a wall.
 				count += 1
 	return count
 
@@ -88,9 +79,7 @@ def createImage(d_map, color=None, chunky=None, fn=None):
 		true_x, true_y = x, y
 	img = Image.new("RGB",(true_x,true_y),(0,0,0))
 	lst = []
-	# Walls are black by default
 	c_wall = [r.randint(0,255), r.randint(0,255), r.randint(0,255)] if color else [0,0,0]
-	# Paths are white by default
 	c_space = [255-x for x in c_wall]
 	if chunky:
 		for line in  d_map:
