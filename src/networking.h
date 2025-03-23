@@ -24,9 +24,12 @@ enum EventType {
 
   EVENT_KILL_ENTITY, 
 
-  EVENT_STAB, 
+  EVENT_STAB,
+  
+  EVENT_KILL_PLAYER,
 
-  EVENT_KILL_PLAYER
+  EVENT_START,
+  EVENT_SET_HUNTER
 };
 
 typedef struct {
@@ -36,6 +39,9 @@ typedef struct {
   int memberCount;
   bool dont_free;
 } Event;
+
+typedef Event EventStart;
+typedef Event EventSetHunter;
 
 typedef struct {
   Event e;

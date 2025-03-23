@@ -1,7 +1,7 @@
 #include "defines.h"
-#include "log.h"
-#include "geo.h"
 #include "entities.h"
+#include "geo.h"
+#include "log.h"
 #include <networking.h>
 #include <player.h>
 #include <stdio.h>
@@ -26,7 +26,6 @@ Event *new_event(unsigned long size, enum EventType type) {
   return e;
 }
 
-
 /*
 This function will send HELLO event to the server
 and wait for the server to respond with a player id for our new client.
@@ -47,7 +46,7 @@ void init_multiplayer() {
   printf("Creating %d players\n", world.playersNumber);
   for (int i = 0; i <= world.playerID; i++) {
     Circle c = {{200 + 100 * i, 200}, 30};
-    world.players[i] = (Player*) p_player_prey_create(i, 400, &c);
+    world.players[i] = (Player *)p_player_prey_create(i, 400, &c);
   }
 }
 
@@ -75,7 +74,8 @@ void p_handle_event(Event *event, int clientID) {
     log_info("Adding the player %d\n", newClientId);
     world.playersNumber++;
     Circle c = {{200 + 100 * newClientId, 200}, 30};
-    world.players[newClientId] = (Player*)p_player_prey_create(newClientId, 400, &c);
+    world.players[newClientId] =
+        (Player *)p_player_prey_create(newClientId, 400, &c);
   }
 
   if (event->type == EVENT_ASSIGN_ID) {
@@ -85,41 +85,53 @@ void p_handle_event(Event *event, int clientID) {
   }
 
   if (event->type == EVENT_PLAYER_MOVE) {
-    EventPlayerMove* epm = (EventPlayerMove*) event;
+    EventPlayerMove *epm = (EventPlayerMove *)event;
     world.players[epm->e.playerID]->hitbox.pos.x = epm->x;
     world.players[epm->e.playerID]->hitbox.pos.y = epm->y;
     world.players[epm->e.playerID]->orientation = epm->orientation;
   }
 
-  if(event->type == EVENT_PLAYER_SHOOT_PAINT_BALL) {
-    EventPlayerShootPaintBall* epm = (EventPlayerShootPaintBall*) event;
-    Paint_ball* ball = p_paint_ball_create(&(epm->start), epm->orientation, epm->player_id, epm->speed_coeff, epm->radius,epm->splash_radius, epm->max_dis_squared);
-    p_entity_tab_add((Entity*) ball);
+  if (event->type == EVENT_PLAYER_SHOOT_PAINT_BALL) {
+    EventPlayerShootPaintBall *epm = (EventPlayerShootPaintBall *)event;
+    Paint_ball *ball = p_paint_ball_create(
+        &(epm->start), epm->orientation, epm->player_id, epm->speed_coeff,
+        epm->radius, epm->splash_radius, epm->max_dis_squared);
+    p_entity_tab_add((Entity *)ball);
   }
 
-  if(event->type == EVENT_KILL_ENTITY) {
-    EventKillEntity *epm = (EventKillEntity *) event;
-    for(unsigned int i = 0; i < OBJECT_LIMIT; ++i)
-    {
-        if(EntityTab[i] != NULL)
-        {
-            if(EntityTab[i]->iD == epm->iD)
-                EntityTab[i]->alive = 0;
-        }
+  if (event->type == EVENT_KILL_ENTITY) {
+    EventKillEntity *epm = (EventKillEntity *)event;
+    for (unsigned int i = 0; i < OBJECT_LIMIT; ++i) {
+      if (EntityTab[i] != NULL) {
+        if (EntityTab[i]->iD == epm->iD)
+          EntityTab[i]->alive = 0;
+      }
     }
   }
 
-  if(event->type == EVENT_KILL_PLAYER)
-  {
-    EventKillPlayer *ekp = (EventKillPlayer *) event;
+  if (event->type == EVENT_KILL_PLAYER) {
+    EventKillPlayer *ekp = (EventKillPlayer *)event;
     world.players[ekp->victim_iD]->alive = 0;
   }
 
-  if(event->type == EVENT_STAB && isServer)
-  {
-    EventStab *es = (EventStab *) event;
+  if (event->type == EVENT_STAB && isServer) {
+    EventStab *es = (EventStab *)event;
     p_stab_calculate_broadcast(es->stabber_id);
   }
 
-}
+  if (event->type == EVENT_START) {
+    for (int i = 0; i < world.playersNumber; i++) {
+      Circle c = {{200 + 100 * i, 200}, 30};
+      world.players[i]->hitbox = c;
+    }
+    game_state = IN_GAME;
+  }
 
+  if (event->type == EVENT_SET_HUNTER) {
+    int hunter = event->playerID;
+    log_info("Player %d is the hunter\n", hunter);
+    free((PlayerPrey*)world.players[hunter]);
+    Circle c = {{0, 0}, 0};
+    world.players[hunter] = (Player*)p_player_hunter_create(hunter, 200, &c, 20, 20);
+  }
+}

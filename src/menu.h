@@ -3,6 +3,7 @@
 
 #define NUMBER_OF_MENU_BUTTONS 3
 #define NUMBER_OF_SERVER_BUTTONS 2
+#define NUMBER_OF_LOBBY_BUTTONS 1
 #define NUMBER_OF_SERVER_INPUTS 2
 
 typedef struct {
@@ -34,3 +35,4 @@ Button *p_init_client_buttons();                 // init all server buttons
 Button *p_init_menu_buttons();                 // init all menu buttons
 Input *p_init_client_inputs();
 void p_draw_input(Input *button, bool focused); // draws a button
+Button *p_init_lobby_buttons();
