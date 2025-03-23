@@ -56,10 +56,21 @@ int main(int argc, char **argv) {
   world.map = map;
   Sounds *sounds = p_init_sounds();
 
+  Music music_calm = LoadMusicStream("assets/sound/music_calm.mp3");
+  Music music_pursuit = LoadMusicStream("assets/sound/music_pursuit.mp3");
+  Music *mu = &music_calm;
+  enum music_states music_state = MUSIC_CALM;
+  PlayMusicStream(*mu);
+
 
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
+
+    //printf("%p\n",mu);
+    UpdateMusicStream(*mu);
+
+
     cursor = GetMousePosition();
     Position cursor_pos_with_offset = cursor_with_offset(cursor);
 
@@ -143,9 +154,12 @@ int main(int argc, char **argv) {
 
       p_camera_follow();
       p_draw_map(map);
+
+
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
+
           if (!world.players[i]->alive)
             DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
                        world.players[i]->hitbox.pos.y - world.offset.y,
@@ -166,6 +180,40 @@ int main(int argc, char **argv) {
             }
           }
         }
+      }
+
+      enum music_states music_state2 = MUSIC_CALM; //rofl
+
+      if (world.players[world.playerID]->type == PLAYER_HUNTER)
+      {
+        for (int i = 0; i < 4; i++){
+            if(world.players[i] != NULL)
+            {
+                printf("%d\n", world.players[i]->alive);
+                if(world.players[i]->alive && world.players[i]->tagged)
+                {
+                    music_state2 = MUSIC_PURSUIT;
+                }
+            }
+        }
+      }
+      else
+      {
+        if(world.players[world.playerID]->alive && world.players[world.playerID]->tagged)
+            music_state2 = MUSIC_PURSUIT;
+      }
+
+
+      //printf("%d %d\n",music_state,music_state2);
+      if(music_state != music_state2)
+      {
+         StopMusicStream(*mu);
+         music_state = music_state2;
+         if(music_state == MUSIC_CALM)
+            mu = &music_calm;
+         else
+            mu = &music_pursuit;
+         PlayMusicStream(*mu);
       }
 
       if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -195,7 +243,7 @@ int main(int argc, char **argv) {
   // p_player_prey_free(world.players[0]);
   // p_player_prey_free(world.players[1]);
   //--------------------------------------------------------------------------------------
-  p_free_map(map);
   p_free_sounds(sounds);
+  p_free_map(map);
   return 0;
 }
