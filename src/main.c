@@ -2,6 +2,7 @@
 #include "geo.h"
 #include "map.h"
 #include "menu.h"
+#include "player.h"
 #include "sound.h"
 #include "world.h"
 #include <ctype.h>
@@ -142,18 +143,25 @@ int main(int argc, char **argv) {
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
-          if(!world.players[i]->alive)
+          if (!world.players[i]->alive)
             DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
-                     world.players[i]->hitbox.pos.y - world.offset.y,
-                     world.players[i]->hitbox.radius, GREEN);
-          else if(world.players[i]->tagged)
+                       world.players[i]->hitbox.pos.y - world.offset.y,
+                       world.players[i]->hitbox.radius, GREEN);
+          else if (world.players[i]->tagged)
             DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
-                     world.players[i]->hitbox.pos.y - world.offset.y,
-                     world.players[i]->hitbox.radius, YELLOW);
-          else
-            DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
-                     world.players[i]->hitbox.pos.y - world.offset.y,
-                     world.players[i]->hitbox.radius, DARKBLUE);
+                       world.players[i]->hitbox.pos.y - world.offset.y,
+                       world.players[i]->hitbox.radius, YELLOW);
+          else {
+            if (world.players[i]->type == PLAYER_HUNTER) {
+              DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                         world.players[i]->hitbox.pos.y - world.offset.y,
+                         world.players[i]->hitbox.radius, RED);
+            } else if (world.players[world.playerID]->type != PLAYER_HUNTER) {
+              DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                         world.players[i]->hitbox.pos.y - world.offset.y,
+                         world.players[i]->hitbox.radius, DARKBLUE);
+            }
+          }
         }
       }
 

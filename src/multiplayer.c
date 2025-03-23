@@ -4,6 +4,7 @@
 #include "log.h"
 #include <networking.h>
 #include <player.h>
+#include <pthread.h>
 #include <stdio.h>
 
 /*
@@ -21,7 +22,8 @@ Event *new_event(unsigned long size, enum EventType type) {
   e->magic = 69;
   e->playerID = world.playerID;
   e->type = type;
-  e->memberCount = 1;
+  pthread_mutex_init(&e->memberCountMutex, NULL);
+  e->memberCount = 0;
   e->dont_free = 0;
   return e;
 }

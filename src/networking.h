@@ -1,3 +1,4 @@
+#include <bits/pthreadtypes.h>
 #include <chan.h>
 #include <defines.h>
 int p_start_server();
@@ -39,6 +40,7 @@ typedef struct {
   int magic; // always 69
   enum EventType type;
   int playerID;
+  pthread_mutex_t memberCountMutex;
   int memberCount;
   bool dont_free;
 } Event;
