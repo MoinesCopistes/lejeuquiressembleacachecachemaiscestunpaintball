@@ -141,6 +141,7 @@ Map *p_load_map(const char *path) {
     } else {
       x++;
     }
+}
     fclose(file);
     n_row = y;
     log_info("Number of row parsed : %i", n_row);
@@ -159,7 +160,7 @@ Map *p_load_map(const char *path) {
             x++;
         }
     }
-  }
+  
   fclose(file);
   TileSet *tileset = _init_tileset();
   Tile **tiles = _get_tile_grid(n_col, n_row, chars, tileset);
