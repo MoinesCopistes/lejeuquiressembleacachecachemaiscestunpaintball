@@ -15,6 +15,8 @@ struct Player {
   float accel_coeff;
   float orientation;
   int alive;
+  int tagged;
+  float timer;
 };
 
 Player *p_player_create(PlayerType type, unsigned int iD, float speed,
@@ -25,6 +27,7 @@ Player* p_player_create(PlayerType type, unsigned int iD, float speed, Circle *h
 int p_player_update_orientation(Player *player, Position *cursor);
 void p_player_send_event_player_move(Player *player);
 void p_player_move(Player *player, Position *cursor, Map* map);
+void p_player_update_tagged();
 
 typedef struct PlayerHunter PlayerHunter;
 struct PlayerHunter {

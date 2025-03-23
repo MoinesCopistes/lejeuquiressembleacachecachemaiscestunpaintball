@@ -114,8 +114,15 @@ void p_handle_event(Event *event, int clientID) {
     world.players[ekp->victim_iD]->alive = 0;
   }
 
-  if (event->type == EVENT_STAB && isServer) {
-    EventStab *es = (EventStab *)event;
+  if(event->type == EVENT_TAG_PLAYER)
+  {
+    EventTagPlayer *etp = (EventTagPlayer *) event;
+    world.players[etp->tagged_iD]->tagged = 1;
+  }
+
+  if(event->type == EVENT_STAB && isServer)
+  {
+    EventStab *es = (EventStab *) event;
     p_stab_calculate_broadcast(es->stabber_id);
   }
 

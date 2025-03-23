@@ -135,12 +135,23 @@ int main(int argc, char **argv) {
           p_player_send_event_player_move(world.players[world.playerID]);
       }
 
+      p_player_update_tagged();
+
       p_camera_follow();
       p_draw_map(map);
       for (int i = 0; i < 4; i++) {
 
         if (world.players[i] != NULL) {
-          DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+          if(world.players[i]->tagged)
+            DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                     world.players[i]->hitbox.pos.y - world.offset.y,
+                     world.players[i]->hitbox.radius, YELLOW);
+          else if(!world.players[i]->alive)
+            DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
+                     world.players[i]->hitbox.pos.y - world.offset.y,
+                     world.players[i]->hitbox.radius, GREEN);
+          else
+            DrawCircle(world.players[i]->hitbox.pos.x - world.offset.x,
                      world.players[i]->hitbox.pos.y - world.offset.y,
                      world.players[i]->hitbox.radius, DARKBLUE);
         }
@@ -148,6 +159,10 @@ int main(int argc, char **argv) {
 
       if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         p_player_paint_ball_shoot(world.players[world.playerID]);
+      }
+
+      if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+        p_player_stab(world.players[world.playerID]);
       }
 
       p_entity_tab_update();

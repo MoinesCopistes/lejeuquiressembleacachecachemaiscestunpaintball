@@ -28,8 +28,13 @@ enum EventType {
   
   EVENT_KILL_PLAYER,
 
+  EVENT_KILL_PLAYER,
+
+  EVENT_TAG_PLAYER,
+
   EVENT_START,
   EVENT_SET_HUNTER
+
 };
 
 typedef struct {
@@ -78,8 +83,15 @@ typedef struct {
 
 typedef struct {
   Event e;
+  int tagged_iD;
+} EventTagPlayer;
+
+typedef struct {
+  Event e;
   int stabber_id;
 } EventStab;
+
+
 
 void p_handle_event(Event *event, int clientID);
 

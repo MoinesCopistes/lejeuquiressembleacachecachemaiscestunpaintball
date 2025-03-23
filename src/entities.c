@@ -91,10 +91,33 @@ void p_paint_ball_update(Entity *entity)
 
         if(splashed)
         {
+            //kill
             ball->e.alive = 0;
             EventKillEntity *epm = (EventKillEntity *)new_event(sizeof(EventKillEntity), EVENT_KILL_ENTITY);
             epm->iD = ball->e.iD;
             broadcast_event((Event *)epm, -1);
+
+            //tag
+            Circle fallout;
+            fallout.pos.x = ball->hitbox.pos.x;
+            fallout.pos.y = ball->hitbox.pos.y;
+            fallout.radius = ball->splash_radius;
+
+            for(unsigned int i = 0; i < 4; ++i)
+            {
+                if(i != ball->player_id && world.players[i] != NULL)
+                {
+                    if(p_circle_is_in_circle(&fallout,&(world.players[i]->hitbox)))
+                    {
+                        //update myself
+                        world.players[i]->tagged = 1;
+                        //send event to update others
+                        EventTagPlayer *etp = (EventTagPlayer *)new_event(sizeof(EventTagPlayer), EVENT_TAG_PLAYER);
+                        etp->tagged_iD = i;
+                        broadcast_event((Event *)etp, -1);
+                    }
+                }
+            }
         }
         
     }
